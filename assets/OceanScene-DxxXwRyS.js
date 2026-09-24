@@ -1,4 +1,4 @@
-import{r as da,j as il}from"./index-Bp16FATz.js";/**
+import{r as da,j as il}from"./index-CUpgv3Mo.js";/**
  * @license
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
