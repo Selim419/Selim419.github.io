@@ -1,8 +1,8 @@
 name: Deploy root site
 
 on:
-  repository_dispatch:
-    types: [deploy]
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -11,39 +11,47 @@ permissions:
 
 concurrency:
   group: pages-root
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
+    timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the pinned source commit
+        id: pin
+        run: echo "sha=$(tr -d '[:space:]' < .deploy-source)" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
         with:
           repository: Selim419/subnautica-source
-          ref: ${{ github.event.client_payload.sha }}
+          ref: ${{ steps.pin.outputs.sha }}
+          path: source
 
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: app/package-lock.json
+          cache-dependency-path: source/app/package-lock.json
 
       - name: Install
+        working-directory: source/app
         run: npm ci
 
       - name: Build
+        working-directory: source/app
         run: npm run build:root
 
       - name: Verify base
+        working-directory: source/app
         run: node scripts/verify-base.mjs /
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: app/dist
+          path: source/app/dist
 
       - uses: actions/deploy-pages@v4
