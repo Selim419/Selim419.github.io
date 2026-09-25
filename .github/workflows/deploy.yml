@@ -1,0 +1,49 @@
+name: Deploy root site
+
+on:
+  repository_dispatch:
+    types: [deploy]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-root
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Selim419/subnautica-source
+          ref: ${{ github.event.client_payload.sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build:root
+
+      - name: Verify base
+        run: node scripts/verify-base.mjs /
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/dist
+
+      - uses: actions/deploy-pages@v4
