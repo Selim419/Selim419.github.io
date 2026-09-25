@@ -20,9 +20,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Guard against a swapped base
+        run: |
+          f=.github/workflows/deploy.yml
+          # The "must be absent" scan runs over the file with this step's own
+          # `grep -q` lines removed. Those lines necessarily contain the very
+          # strings they forbid, so scanning the whole file would make the guard
+          # match itself and turn a correct workflow red.
+          rest=$(grep -v 'grep -q' "$f")
+          grep -q 'npm run build:root' "$f" || { echo "::error::root site must build with build:root"; exit 1; }
+          grep -q 'verify-base\.mjs /$' "$f" || { echo "::error::root site must verify against /"; exit 1; }
+          if grep -q 'subnautica-derinlik-gunlugu' <<<"$rest"; then echo "::error::root workflow contains the subpath base - swapped"; exit 1; fi
+
       - name: Read the pinned source commit
         id: pin
-        run: echo "sha=$(tr -d '[:space:]' < .deploy-source)" >> "$GITHUB_OUTPUT"
+        run: |
+          test -s .deploy-source || { echo "::error::.deploy-source is missing or empty"; exit 1; }
+          sha="$(tr -d '[:space:]' < .deploy-source)"
+          echo "$sha" | grep -Eq '^[0-9a-f]{40}$' || { echo "::error::.deploy-source is not a full commit SHA: $sha"; exit 1; }
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         with:
@@ -39,6 +55,10 @@ jobs:
       - name: Install
         working-directory: source/app
         run: npm ci
+
+      - name: Test base assertion
+        working-directory: source/app
+        run: npm run test:base
 
       - name: Build
         working-directory: source/app
