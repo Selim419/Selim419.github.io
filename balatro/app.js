@@ -1,5 +1,7 @@
 import { SUITS, SYMBOLS, SUIT_NAMES, RANK, HANDS, JOKERS, DECKS, TAROTS, VOUCHERS, createRun, jokerSlots, currentBoss, blindTarget, isDebuffed, scoreHand, startBlind, selectCard, playHand, discard, collectReward, continueEndless, leaveShop, skipBlind, reroll, buy, pickPack, sellJoker, moveJoker, sortHand } from './engine.js';
 
+import { sprite, jokerArt, courtArt, pipArt } from './art.js';
+
 const $ = s => document.querySelector(s);
 const KEY = 'balatro-web-run-v1', SETTINGS = 'balatro-web-settings-v1';
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -16,6 +18,7 @@ function validRun(s) {
     && [...s.cards, ...s.hand, ...s.pile].every(c => c && SUITS.includes(c.suit) && c.rank >= 2 && c.rank <= 14 && typeof c.id === 'string')
     && (s.phase !== 'settlement' || s.payout && Number.isFinite(s.payout.total));
 }
+let playedCards = [];
 let cached = read(KEY, null), state = validRun(cached) ? cached : createRun();
 let settings = { sound: false, ...read(SETTINGS, {}) }, busy = false, toastTimer, audio, newDeck = 'red', storageWarning = false;
 function save() {
@@ -39,38 +42,17 @@ function sound(type = 'select') {
     });
   } catch { /* Silent fallback for browsers without Web Audio. */ }
 }
-function jokerArt(j) {
-  const art = {
-    jester: '<path d="m19 48 7-27 21 16 22-21 10 34-30-5Z" fill="currentColor"/><circle cx="26" cy="21" r="5"/><circle cx="69" cy="16" r="5"/><path d="M27 48h47v16c0 29-47 29-47 0Z" fill="var(--color-paper)"/><path d="m33 57 9 2m18 0 9-2M38 73q13 12 26-1" stroke="currentColor" stroke-width="4" fill="none"/><circle cx="52" cy="67" r="4"/><path d="m27 88-9 17h65L73 88l-22 7Z" fill="currentColor"/>',
-    diamond: '<path d="m50 19 32 39-32 41-32-41Z" fill="currentColor"/><path d="m50 30 21 28-21 29-21-29Z" stroke="var(--color-paper)" fill="none" stroke-width="2"/>',
-    heart: '<path d="M50 91 21 61C-2 35 33 12 50 39c17-27 52-4 29 22Z" fill="currentColor"/>',
-    spade: '<path d="M50 20C35 45 15 48 15 68c0 17 24 22 34 5l-9 28h20l-9-28c10 17 34 12 34-5 0-20-20-23-35-48Z" fill="currentColor"/>',
-    club: '<circle cx="50" cy="40" r="20" fill="currentColor"/><circle cx="30" cy="67" r="20" fill="currentColor"/><circle cx="70" cy="67" r="20" fill="currentColor"/><path d="m49 66-11 38h24L51 66Z" fill="currentColor"/>',
-    star: '<path d="m50 17 11 28 30 2-23 20 7 30-25-17-25 17 7-30L9 47l30-2Z" fill="currentColor"/><circle cx="50" cy="59" r="11" fill="var(--art-light)"/>',
-    eye: '<path d="M10 60q40-60 80 0-40 60-80 0Z" fill="var(--color-paper)" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="60" r="20" fill="currentColor"/><circle cx="54" cy="55" r="6" fill="var(--color-paper)"/><path d="M50 14v10m25 2-7 8m-43-8 7 8M50 96v10" stroke="currentColor" stroke-width="3"/>',
-    flag: '<path d="M26 105V19m0 5h52L64 42l14 19H26" fill="currentColor" stroke="currentColor" stroke-width="4"/><path d="m38 34 9 8-9 8m16-16 9 8-9 8" stroke="var(--art-light)" fill="none" stroke-width="3"/>',
-    abstract: '<path d="M15 25h40v40H15Zm30 30h40v40H45Z" fill="currentColor"/><circle cx="62" cy="42" r="21" fill="var(--color-paper)"/><path d="m15 96 23-38 22 38Z" fill="var(--color-gold)"/>',
-    spiral: '<path d="M50 60c-10-18 24-32 32-8 13 36-43 54-62 17C-2 19 65-1 92 38" stroke="currentColor" stroke-width="6" fill="none"/><text x="41" y="69" font-size="22" fill="currentColor" font-family="monospace">φ</text>',
-    number: `<text x="50" y="83" text-anchor="middle" font-size="72" font-family="monospace" font-weight="bold" fill="currentColor">${j.id === 'even' ? '2' : '7'}</text><path d="M20 95h60M20 24h60" stroke="currentColor" stroke-width="3"/>`,
-    half: '<path d="M19 27h60v67H19Z" fill="var(--color-paper)"/><path d="M19 27h30v67H19Z" fill="currentColor"/><path d="m49 27 8 12-8 12 8 12-8 12 8 12-8 7" stroke="currentColor" fill="none" stroke-width="3"/>',
-    card: '<rect x="20" y="24" width="52" height="72" rx="4" fill="var(--color-paper)" transform="rotate(-12 50 60)"/><text x="50" y="78" text-anchor="middle" font-size="50" fill="currentColor">♠</text>',
-    ice: '<path d="m26 63 24 44 24-44Z" fill="currentColor"/><path d="m35 70 26 21m5-20L43 91" stroke="var(--art-light)" stroke-width="2"/><path d="M20 63c-8-9 0-22 10-22-5-27 42-32 40 0 14 0 21 12 10 22Z" fill="var(--color-paper)"/><path d="M31 35q18-23 34 1" fill="none" stroke="currentColor" stroke-width="3"/>',
-    banana: '<path d="M21 25c16 47 41 44 61 11 13 51-54 82-65 1Z" fill="var(--color-paper)" stroke="currentColor" stroke-width="3"/><path d="M25 40c13 30 30 33 49 10" fill="none" stroke="currentColor" stroke-width="2"/>',
-    rocket: '<path d="M50 15c-19 15-26 34-19 61h38c7-27 0-46-19-61Z" fill="var(--color-paper)"/><circle cx="50" cy="46" r="10" fill="currentColor"/><path d="m29 58-15 26 18-4m39-22 15 26-18-4M40 81l10 26 10-26" fill="currentColor"/>',
-  };
-  return `<svg class="joker-art" viewBox="0 0 100 120" fill="currentColor" aria-hidden="true"><path d="M0 0h100v120H0z" fill="var(--art-light)"/><path d="M0 0 100 120M-25 0 75 120M25 0 125 120M-50 0 50 120M50 0 150 120" stroke="var(--art-dark)" stroke-width="1" opacity=".12"/>${art[j.art] || art.jester}</svg>`;
-}
 function jokerCard(j, action = '', uid = '') {
-  return `<${action ? 'button type="button"' : 'div'} class="joker-card art-${j.color}" ${action ? `data-action="${action}" data-id="${esc(uid)}" aria-label="${esc(j.name + ' : ' + j.desc)}" title="${esc(j.name + ' — ' + j.desc)}"` : ''}>${jokerArt(j)}<span class="joker-corner">JOKER</span></${action ? 'button' : 'div'}>`;
+  return `<${action ? 'button type="button"' : 'div'} class="joker-card art-${j.color} ${j.rarity === 'Sıra dışı' ? 'rare' : ''}" ${action ? `data-action="${action}" data-id="${esc(uid)}" aria-label="${esc(j.name + ' : ' + j.desc)}" title="${esc(j.name + ' — ' + j.desc)}"` : ''}>${jokerArt(j)}<span class="joker-corner">JOKER</span></${action ? 'button' : 'div'}>`;
 }
 const enhanceNames = { bonus: '+30 FIŞ', mult: '+4 ÇARPAN', steel: 'ÇELİK', glass: 'CAM', wild: 'VAHŞİ' };
 function card(c, interactive = false, i = 0, small = false) {
   const red = ['H', 'D'].includes(c.suit), selected = state.selected.includes(c.id), debuff = isDebuffed(state, c);
   const rank = RANK[c.rank] || c.rank, symbol = SYMBOLS[c.suit];
   const tag = interactive ? 'button' : 'div';
-  return `<${tag} ${interactive ? `type="button" data-action="card" data-id="${esc(c.id)}" aria-pressed="${selected}"` : ''} class="playing-card ${red ? 'red' : ''} ${interactive && selected ? 'selected' : ''} ${debuff ? 'debuffed' : ''} ${c.enhancement ? 'enhanced' : ''} ${small && !state.pile.some(x => x.id === c.id) ? 'drawn' : ''}" style="--tilt:${interactive ? (i - (state.hand.length - 1) / 2) * .8 : 0}deg;--i:${i}" aria-label="${SUIT_NAMES[c.suit]} ${rank}${c.enhancement ? ', ' + enhanceNames[c.enhancement] : ''}${debuff ? ', etkisiz' : ''}">
+  return `<${tag} ${interactive ? `type="button" data-action="card" data-id="${esc(c.id)}" aria-pressed="${selected}"` : ''} class="playing-card ${red ? 'red' : ''} ${interactive && selected ? 'selected' : ''} ${debuff ? 'debuffed' : ''} ${c.enhancement ? 'enhanced' : ''} ${c.rank >= 11 && c.rank <= 13 ? 'royal-card' : ''} ${small && !state.pile.some(x => x.id === c.id) ? 'drawn' : ''}" style="--tilt:${interactive ? (i - (state.hand.length - 1) / 2) * .8 : 0}deg;--i:${i}" aria-label="${SUIT_NAMES[c.suit]} ${rank}${c.enhancement ? ', ' + enhanceNames[c.enhancement] : ''}${debuff ? ', etkisiz' : ''}">
     <span class="card-corner">${rank}<small>${symbol}</small></span>
-    <span class="card-pip ${c.rank > 10 && c.rank < 14 ? 'face' : ''}">${c.rank > 10 && c.rank < 14 ? `<span>${rank}<small style="font-size:.45em">${symbol}</small></span>` : symbol}</span>
+    <span class="card-face">${c.rank >= 11 && c.rank <= 13 ? courtArt(c) : pipArt(c, symbol)}</span>
     <span class="card-corner bottom">${rank}<small>${symbol}</small></span>
     ${interactive && selected ? '<span class="card-check">✓</span>' : ''}${debuff ? '<span class="debuff-line"></span>' : ''}
     ${c.enhancement ? `<span class="enhancement">${enhanceNames[c.enhancement]}</span>` : ''}
@@ -99,12 +81,12 @@ function jokerZone() {
   return `<section class="joker-zone" aria-label="Jokerlerin"><div class="zone-header"><span class="eyebrow">JOKERLERİN</span><span class="count">${state.jokers.length} / ${jokerSlots(state)}</span></div><div class="joker-row" style="${jokerSlots(state) > 5 ? 'flex-wrap:wrap' : ''}">
     ${state.jokers.map(j => jokerCard(JOKERS.find(d => d.id === j.id), 'joker', j.uid)).join('')}
     ${Array.from({ length: Math.max(0, jokerSlots(state) - state.jokers.length) }, () => '<div class="joker-slot" aria-hidden="true">+</div>').join('')}
-    ${state.jokers.length === 0 ? '<p class="joker-hint">Küçük bir joker.<br>Büyük bir fark.<br><span>Dükkânda seni bekliyor.</span></p>' : ''}</div></section>`;
+    ${state.jokers.length === 0 ? `<div class="joker-hint"><div class="dealer-card">${jokerArt(JOKERS[0])}</div><p>İyi bir el başlangıçtır.<br><strong>Jokerler oyunu değiştirir.</strong></p></div>` : ''}</div></section>`;
 }
 function blindSelect() {
-  return `<section class="blind-select"><div class="section-heading"><h1>${state.round === 0 ? 'Her büyük seri bir elle başlar.' : 'Bir el daha.'}</h1><p>${state.blind === 2 ? esc(currentBoss(state).desc) : 'Poker elleri kur. Jokerleri birleştir. Hedefi aş.'}</p></div><div class="blind-options">${[0, 1, 2].map(i => {
+  return `<section class="blind-select"><div class="section-heading"><span class="blind-mascot" aria-hidden="true">${jokerArt(JOKERS[0])}</span><h1>${state.round === 0 ? 'Blind seç' : 'Sıradaki blind'}</h1><p>${state.blind === 2 ? esc(currentBoss(state).desc) : 'Önce küçük başla. Sonra kuralları değiştir.'}</p></div><div class="blind-options">${[0, 1, 2].map(i => {
     const current = state.blind === i, done = i < state.blind;
-    return `<article class="blind-option ${current ? 'current' : done ? 'done' : 'future'}">${chip(i)}<h3>${blindName(i)}</h3><div class="blind-target">${num(blindTarget(state, i))}</div><div class="blind-reward">Ödül <strong>$${[3, 4, 5][i]}</strong></div>${i === 2 ? `<p class="boss-desc">${esc(currentBoss(state).desc)}</p>` : '<p class="boss-desc">&nbsp;</p>'}
+    return `<article class="blind-option ${current ? 'current' : done ? 'done' : 'future'}">${chip(i)}<h3>${blindName(i)}</h3><div class="blind-target">${num(blindTarget(state, i))}</div><div class="blind-reward">ÖDÜL <strong>${"$".repeat([3, 4, 5][i])}</strong></div>${i === 2 ? `<p class="boss-desc">${esc(currentBoss(state).desc)}</p>` : '<p class="boss-desc">&nbsp;</p>'}
       ${current ? `${btn('start', 'Turu başlat', 'primary full')}${i < 2 ? '<button class="skip" data-action="skip">Pas geç · +$5</button>' : '<div class="locked-label">Son mücadele</div>'}` : `<div class="locked-label">${done ? '✓ Geçildi' : 'Sıradaki tur'}</div><div class="locked-label">${done ? 'Tamamlandı' : i === 2 ? 'BOSS' : 'KİLİTLİ'}</div>`}</article>`;
   }).join('')}</div></section>`;
 }
@@ -114,7 +96,7 @@ function resultEffects(result) {
 function playing() {
   const result = state.lastResult;
   return `<div class="play-watermark" aria-hidden="true">♠</div><section class="playing-center" aria-label="Oyun masası">${state.blind === 2 ? `<div class="boss-warning"><strong>${currentBoss(state).name}:</strong> ${esc(currentBoss(state).desc)}</div>` : ''}
-    ${result ? `<div class="eyebrow">SON EL · ${result.name.toLocaleUpperCase('tr')}</div><div class="score-pop">+${num(result.score)}</div><div class="last-hand">${num(result.chips)} fiş × ${num(result.mult)} çarpan</div><div class="effects-list">${resultEffects(result)}</div>` : `<div class="center-prompt">Masa senin.</div><p class="center-sub">Aşağıdan 1–5 kart seçerek bir poker eli oluştur.<br>İyi kartları tut, diğerlerini değiştir.</p>`}
+    ${result ? `<div class="played-cards">${playedCards.map(c => card(c)).join('')}</div><div class="eyebrow">SON EL · ${result.name.toLocaleUpperCase('tr')}</div><div class="score-pop">+${num(result.score)}</div><div class="last-hand">${num(result.chips)} fiş × ${num(result.mult)} çarpan</div><div class="effects-list">${resultEffects(result)}</div>` : `<div class="center-prompt">Masa senin.</div><p class="center-sub">Aşağıdan 1–5 kart seçerek bir poker eli oluştur.<br>İyi kartları tut, diğerlerini değiştir.</p>`}
     ${state.selected.length ? `<div class="last-hand">Tahmini puan: <strong style="color:var(--color-gold)">${num(scoreHand(state, state.hand.filter(c => state.selected.includes(c.id))).score)}</strong></div>` : ''}
   </section>`;
 }
@@ -131,7 +113,8 @@ function itemInfo(item) {
 }
 function itemArt(item, info) {
   if (item.type === 'joker') return jokerCard(info);
-  return `<div class="item-art ${item.type}-art" aria-hidden="true">${item.type === 'tarot' ? info.glyph : item.type === 'voucher' ? 'V' : item.type === 'pack' ? 'J' : ''}</div>`;
+  const index = item.type === 'planet' ? 12 + HANDS.findIndex(h => h.id === item.id) : item.type === 'tarot' ? 21 : item.type === 'pack' ? 22 : 23;
+  return `<div class="item-art illustrated-item ${item.type}-art" aria-hidden="true">${sprite('cards', index)}${item.type === 'tarot' ? `<span class="tarot-numeral">${info.glyph}</span>` : ''}</div>`;
 }
 function shop() {
   if (state.pack) return `<section class="shop"><div class="section-heading"><h2>İçinden biri senin.</h2><p>Bir joker seç. Joker yuvaların doluysa önce bir jokerini sat.</p></div><div class="shop-grid">${state.pack.map(j => {
@@ -156,6 +139,8 @@ function handZone(deal) {
 }
 function render(deal = false) {
   const focused = document.activeElement?.dataset;
+  document.body.dataset.phase = state.phase;
+  document.body.dataset.boss = String(state.blind === 2);
   const content = state.phase === 'blind' ? blindSelect() : state.phase === 'playing' ? playing() : state.phase === 'settlement' ? settlement() : state.phase === 'shop' ? shop() : endState(state.phase === 'victory');
   $('#app').innerHTML = `<div class="shell"><header class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true">♠</div><div><div class="wordmark">BALATRO<span style="color:var(--color-coral)">.</span></div><div class="brand-sub">BİR EL DAHA.</div></div></div><nav class="top-actions" aria-label="Oyun menüsü"><button class="top-link" data-action="help" aria-label="Nasıl oynanır?"><span class="desktop-label">Nasıl oynanır?</span><span class="mobile-label">?</span></button><button class="top-link icon-btn" data-action="sound" aria-label="${settings.sound ? 'Sesi kapat' : 'Sesi aç'}" aria-pressed="${Boolean(settings.sound)}">${icon(settings.sound ? 'sound' : 'mute')}</button><button class="top-link new-game" data-action="new">Yeni seri ↗</button></nav></header>
     <div class="runbar"><span class="eyebrow"><span class="live-dot"></span><strong>${DECKS.find(d => d.id === state.deck).name}</strong> · ${state.phase === 'shop' ? 'DÜKKÂN' : 'TUR ' + (state.round || 1)}</span><span class="seed">TOHUM <strong>${esc(state.seed)}</strong></span></div>
@@ -191,13 +176,14 @@ function handle(action, id, el) {
   let changed = false, deal = false;
   switch (action) {
     case 'card': changed = selectCard(state, id); sound(); break;
-    case 'start': changed = startBlind(state); deal = true; sound('play'); break;
+    case 'start': playedCards = []; changed = startBlind(state); deal = true; sound('play'); break;
     case 'skip': changed = skipBlind(state); toast('Blind pas geçildi · +$5'); break;
     case 'discard': changed = discard(state); if (changed) { deal = true; sound('discard'); } break;
     case 'play': {
+      const nextPlayed = state.hand.filter(c => state.selected.includes(c.id)).map(c => ({ ...c }));
       const result = playHand(state);
       if (result.error) { toast(result.error); break; }
-      changed = true; busy = true; sound(state.phase === 'settlement' ? 'win' : 'play');
+      playedCards = nextPlayed; changed = true; busy = true; sound(state.phase === 'settlement' ? 'win' : 'play');
       setTimeout(() => { busy = false; render(true); }, 650); break;
     }
     case 'collect': changed = collectReward(state); sound('buy'); break;

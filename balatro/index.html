@@ -9,11 +9,16 @@
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css">
-  <script type="module" src="./app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+  <link rel="preload" href="./assets/jokers-atlas.webp" as="image" type="image/webp">
+  <link rel="preload" href="./assets/cards-atlas.webp" as="image" type="image/webp">
+  <link rel="stylesheet" href="./style.css?v=2">
+  <script type="module" src="./ambience.js?v=2"></script>
+  <script type="module" src="./app.js?v=2"></script>
 </head>
 <body>
+  <canvas id="plasma" aria-hidden="true"></canvas>
+  <div class="crt" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
   <div id="app"></div>
   <div id="toast" role="status" aria-live="polite"></div>
