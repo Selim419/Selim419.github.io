@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tarih 1. Yazılı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:oklch(94.9% 0.013 92);--white:#fff;--ink:oklch(14.5% 0 0);--soft:oklch(40% 0.008 92);--yellow:oklch(91.5% 0.19 104);--red:oklch(62% 0.235 35);--green:oklch(75% 0.2 150);--blue:oklch(52% 0.27 268);
+--rule:3px solid var(--ink);--rule-thin:2px solid var(--ink);--shadow:6px 6px 0 var(--ink);--shadow-sm:4px 4px 0 var(--ink);--shadow-lift:8px 8px 0 var(--ink);--ease:cubic-bezier(.16,1,.3,1);
+--display:"Archivo Black",Impact,sans-serif;--body:"JetBrains Mono",ui-monospace,monospace;
+--bg:var(--paper);--card:var(--white);--acc:var(--red);--ok:var(--green);--bad:var(--red);--line:var(--ink)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:15px/1.6 var(--body);background:var(--paper);
+ background-image:linear-gradient(oklch(14.5% 0 0/.1) 1px,transparent 1px),linear-gradient(90deg,oklch(14.5% 0 0/.1) 1px,transparent 1px);background-size:40px 40px}
+header{padding:24px 16px 0;max-width:860px;margin:auto}
+h1{margin:0;font:400 clamp(2rem,6vw,3.4rem)/1 var(--display);text-transform:uppercase;letter-spacing:-.02em}
+h1 span{display:inline-block;background:var(--yellow);border:var(--rule);box-shadow:var(--shadow-sm);padding:2px 10px;transform:rotate(-2deg);margin-left:6px;font-size:.6em;vertical-align:middle}
+header p{margin:12px 0 0;font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.75rem}
+nav{display:flex;gap:10px;flex-wrap:wrap;max-width:860px;margin:20px auto 0;padding:0 16px}
+nav button,.btn,.opt,.match button{font-family:var(--display);text-transform:uppercase;border:var(--rule);box-shadow:var(--shadow-sm);cursor:pointer;transition:transform 80ms var(--ease),box-shadow 80ms var(--ease);color:var(--ink);border-radius:0}
+nav button{background:var(--white);padding:8px 14px;font-size:.85rem}
+nav button.on{background:var(--ink);color:var(--yellow)}
+nav button:hover,.btn:hover,.opt:not(:disabled):hover,.match button:not(.done):hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-lift)}
+nav button:active,.btn:active,.opt:active,.match button:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+main{max-width:860px;margin:auto;padding:20px 16px 48px}
+.card{background:var(--white);border:var(--rule);box-shadow:var(--shadow);padding:16px;margin-bottom:18px}
+h2{font:400 1.5rem/1.1 var(--display);text-transform:uppercase;letter-spacing:-.02em;margin:28px 0 14px;display:inline-block;background:var(--yellow);border:var(--rule);padding:4px 10px;transform:rotate(-1deg)}
+h3{margin:0 0 6px;font:400 1.05rem var(--display);text-transform:uppercase}
+.yorum{border:var(--rule-thin);background:var(--yellow);padding:6px 10px;margin-top:8px;font-weight:700}
+.tag{display:inline-block;font:400 .8rem var(--display);text-transform:uppercase;background:var(--ink);color:var(--yellow);padding:2px 8px;margin:0 8px 6px 0}
+audio{width:100%;margin-top:8px}
+.btn{background:var(--red);color:#fff;padding:10px 16px;font-size:.9rem}
+.btn.alt{background:var(--white);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.flash{min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center;font:400 1.3rem/1.3 var(--display);text-transform:uppercase;cursor:pointer;user-select:none}
+.flash .a{font-family:var(--body);text-transform:none;font-weight:800;background:var(--yellow);border:var(--rule-thin);padding:8px 12px;display:inline-block;transform:rotate(-2deg)}
+.opt{display:block;width:100%;text-align:left;margin:10px 0;padding:11px 14px;background:var(--white);font-family:var(--body);font-weight:700;text-transform:none}
+.opt.ok{background:var(--green)}
+.opt.bad{background:var(--red);color:#fff}
+.muted{color:var(--soft);font-weight:700}
+.bar{height:14px;background:var(--white);border:var(--rule-thin);margin:10px 0 16px}
+.bar i{display:block;height:100%;background:var(--red);width:0;transition:width 160ms var(--ease)}
+.tl{display:grid;gap:14px}
+.tl div{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:start}
+.tl div .yorum{display:block}
+.tl b{font:400 1.1rem var(--display);background:var(--ink);color:var(--yellow);text-align:center;padding:4px 0}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.match button{padding:10px;background:var(--white);font-family:var(--body);font-weight:700;text-transform:none}
+.match button.sel{background:var(--yellow)}
+.match button.done{background:var(--green);opacity:.5;cursor:default;box-shadow:none}
+.match button.wrong{background:var(--red);color:#fff}
+#mSonuc{font:400 1.1rem var(--display);text-transform:uppercase}
+.hidden{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+<h1>Tarih<span>1. Yazılı</span></h1>
+<p>11. sınıf · 1683–1789 mücadeleler · Lâle Devri · MEB 6. senaryo</p>
+</header>
+<nav id="nav">
+<button data-t="dinle" class="on">Dinle</button>
+<button data-t="notlar">Notlar</button>
+<button data-t="kart">Kartlar</button>
+<button data-t="eslestir">Eşleştir</button>
+<button data-t="test">Test</button>
+</nav>
+<main>
+
+<section id="dinle">
+<div class="card"><h3>Kısa özet — ElevenLabs (2 dk)</h3><audio controls preload="none" src="ozet_el.mp3"></audio></div>
+<div class="card"><h3>Kısa özet — Ahmet (2,5 dk)</h3><audio controls preload="none" src="ozet.mp3"></audio></div>
+<div class="card"><h3>Notların tamamı (6 dk)</h3><audio controls preload="none" src="notlar.mp3"></audio></div>
+<div class="card muted">Önerilen sıra: tam notu bir kez dinle → Notlar'ı oku → Kartlar → Eşleştir → Test. Sınavdan önce özeti tekrar dinle.</div>
+</section>
+
+<section id="notlar" class="hidden">
+<h2>1683–1789 Siyasi ve Askerî Mücadeleler</h2>
+<div class="card"><h3>II. Viyana Kuşatması (1683)</h3>Merzifonlu Kara Mustafa Paşa Viyana'yı kuşattı. Lehistan ordusunun yardıma gelmesiyle Osmanlı ağır bozguna uğradı.</div>
+<div class="card"><h3>Kutsal İttifak (1683–1699)</h3>Papa öncülüğünde 5 devlet: <b>Avusturya, Venedik, Lehistan, Malta, Rusya</b>.<div class="yorum">14 yıllık savaşlar sonunda Osmanlı taarruz (saldırı) gücünü kaybetti; Sakarya Meydan Muharebesi'ne kadar sürecek geri çekilme ve savunma dönemi başladı.</div></div>
+<h2>Antlaşmalar</h2>
+<div class="tl card" id="tl"></div>
+<h2>Lâle Devri (1718–1730)</h2>
+<div class="card">Pasarofça (1718) ile başlar, Patrona Halil İsyanı (1730) ile biter. Barış ve ıslahat dönemi.<br>Padişah: <b>III. Ahmed</b> · Sadrazam: <b>Nevşehirli Damat İbrahim Paşa</b></div>
+<div class="card"><span class="tag">Diplomasi</span>Paris, Viyana gibi başkentlere geçici elçiler (Yirmisekiz Mehmed Çelebi).<div class="yorum">Sefaretnamelerle Batı tarzı mimari, yaşam ve teknoloji Osmanlı'ya taşındı.</div></div>
+<div class="card"><span class="tag">Kültür & Teknik</span>İlk Türk matbaası (İbrahim Müteferrika ve Sait Efendi). İlk eser: Vankulu Lügati.<div class="yorum">Bilgiye ulaşım ve kitap basımı kolaylaştı. Hattatlar işsiz kalmasın diye dinî eser basımı yasaklandı.</div></div>
+<div class="card"><span class="tag">Sosyal & Sağlık</span>Çiçek aşısı uygulandı. İlk itfaiye: Tulumbacı Ocağı.<div class="yorum">Toplum sağlığı korundu, İstanbul yangınlarına karşı kurumsal önlem alındı.</div></div>
+<div class="card"><span class="tag">Ekonomi & Mimari</span>Yalova'da kâğıt, İstanbul'da çini ve kumaş imalathaneleri. Sadabad Kasrı.<div class="yorum">Yerli üretim desteklendi. Batı etkisi (Barok/Rokoko) mimaride ilk kez uygulandı.</div></div>
+<div class="card" style="background:var(--yellow)"><h3>Kritik hatırlatma</h3>Lâle Devri'nde <b>askerî alanda doğrudan yenilik yapılmadı</b>. Askerî ıslahatlar 18. yüzyılın devamında ağırlık kazandı.</div>
+</section>
+
+<section id="kart" class="hidden">
+<div class="row"><span class="muted" id="kSay"></span><span style="flex:1"></span><button class="btn alt" id="kKar">Karıştır</button></div>
+<div class="bar"><i id="kBar"></i></div>
+<div class="card flash" id="kYuz"></div>
+<div class="row"><button class="btn alt" id="kGeri">← Önceki</button><button class="btn alt" id="kBil">Bilmiyordum</button><button class="btn" id="kTamam">Biliyordum →</button></div>
+<p class="muted">Karta dokun → cevap. "Bilmiyordum" dediklerin sona eklenir.</p>
+</section>
+
+<section id="eslestir" class="hidden">
+<p class="muted">Antlaşmayı solda, onun sınav yorumunu sağda seç.</p>
+<div class="match" id="mBox"></div>
+<p id="mSonuc"></p>
+<button class="btn alt" id="mYeni">Yeniden</button>
+</section>
+
+<section id="test" class="hidden">
+<div class="bar"><i id="tBar"></i></div>
+<div class="card" id="tBox"></div>
+</section>
+
+</main>
+<script>
+const A=[
+ {ad:"Karlofça",yil:1699,kim:"Avusturya, Venedik, Lehistan",md:"Banat hariç Macaristan Avusturya'ya, Mora Venedik'e, Podolya Lehistan'a.",yo:"İlk büyük çaplı toprak kaybı; Batı karşısında üstünlük bitti, savunma politikası benimsendi."},
+ {ad:"İstanbul",yil:1700,kim:"Rusya",md:"Azak Kalesi Rusya'da kaldı; Rusya İstanbul'da elçi bulundurma hakkı aldı.",yo:"Rusya ilk kez Karadeniz'e indi, sıcak denizlere ulaşma imkânı buldu."},
+ {ad:"Prut",yil:1711,kim:"Rusya",md:"Rus ordusu Prut Nehri kıyısında sıkıştırıldı; Azak geri alındı.",yo:"Karlofça'da kaybedilen toprakları geri alma ümidi doğdu."},
+ {ad:"Pasarofça",yil:1718,kim:"Avusturya",md:"Belgrad ve Kuzey Sırbistan kaybedildi.",yo:"Toprakların geri alınamayacağı anlaşıldı; koruma siyasetine geçildi, Batı üstünlüğü kabul edildi, Lâle Devri başladı."},
+ {ad:"Belgrad",yil:1739,kim:"Avusturya ve Rusya (I. Mahmud dönemi)",md:"Belgrad geri alındı.",yo:"Karadeniz'in Türk gölü olduğunu belirten son antlaşma; arabulucu Fransa'nın kapitülasyonları süresiz oldu."},
+ {ad:"Küçük Kaynarca",yil:1774,kim:"Rusya",md:"Kırım bağımsız (dinî yönden Halifeye bağlı); Osmanlı ilk kez savaş tazminatı ödedi.",yo:"Halkı Türk ve Müslüman olan toprak ilk kez kaybedildi; halifeliğin siyasi gücü ilk kez antlaşmada kullanıldı."}
+];
+document.getElementById('tl').innerHTML=A.map(a=>`<div><b>${a.yil}</b><span><strong>${a.ad}</strong> <span class="muted">(${a.kim})</span><br>${a.md}<div class="yorum">${a.yo}</div></span></div>`).join('');
+
+// sekmeler
+const nav=document.getElementById('nav');
+nav.onclick=e=>{const t=e.target.dataset.t;if(!t)return;
+ nav.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===e.target));
+ document.querySelectorAll('main>section').forEach(s=>s.classList.toggle('hidden',s.id!==t));
+ try{localStorage.setItem('tab',t)}catch(_){}};
+try{const t=localStorage.getItem('tab');if(t)nav.querySelector(`[data-t=${t}]`)?.click()}catch(_){}
+
+const kar=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+
+// kartlar
+const K0=[
+ ...A.map(a=>[`${a.ad} Antlaşması hangi yıl, kiminle?`,`${a.yil} — ${a.kim}`]),
+ ...A.map(a=>[`${a.ad} Antlaşması (${a.yil}) — sınav yorumu?`,a.yo]),
+ ["II. Viyana Kuşatması: yıl ve komutan?","1683 — Merzifonlu Kara Mustafa Paşa"],
+ ["Viyana'da Osmanlı'nın yenilmesinde kimin yardımı etkili oldu?","Lehistan ordusu"],
+ ["Kutsal İttifak'taki 5 devlet?","Avusturya, Venedik, Lehistan, Malta, Rusya (Papa öncülüğünde)"],
+ ["Kutsal İttifak savaşlarının önemi?","Osmanlı taarruz gücünü kaybetti; Sakarya'ya kadar sürecek savunma dönemi başladı."],
+ ["İlk kez savaş tazminatı ödenen antlaşma?","Küçük Kaynarca (1774)"],
+ ["Kapitülasyonların süresiz olduğu antlaşma? Kime?","Belgrad (1739) — Fransa"],
+ ["Lâle Devri hangi olaylarla başlar ve biter?","Pasarofça (1718) ile başlar, Patrona Halil İsyanı (1730) ile biter."],
+ ["Lâle Devri padişahı ve sadrazamı?","III. Ahmed — Nevşehirli Damat İbrahim Paşa"],
+ ["Paris'e gönderilen elçi kim? Ne yazdı?","Yirmisekiz Mehmed Çelebi — sefaretname"],
+ ["İlk Türk matbaasını kimler kurdu? İlk eser?","İbrahim Müteferrika ve Sait Efendi — Vankulu Lügati"],
+ ["Matbaada dinî eser basımı neden yasaklandı?","Hattatlar işsiz kalmasın diye"],
+ ["İlk itfaiye teşkilatı?","Tulumbacı Ocağı"],
+ ["Lâle Devri'nde sağlık alanında yenilik?","Çiçek aşısı"],
+ ["Yalova'da ve İstanbul'da açılan imalathaneler?","Yalova: kâğıt · İstanbul: çini ve kumaş"],
+ ["Mimaride ilk kez Batı etkisi hangi akımlarla? Örnek yapı?","Barok/Rokoko — Sadabad Kasrı"],
+ ["Lâle Devri'nde hangi alanda yenilik YAPILMADI?","Askerî alanda"]
+];
+let K=kar(K0),ki=0,acik=false,bilinen=0;
+const kYuz=document.getElementById('kYuz');
+function kGoster(){const k=K[ki];kYuz.innerHTML=acik?`<div><div class="muted" style="font-size:.95rem">${k[0]}</div><div class="a" style="margin-top:10px">${k[1]}</div></div>`:k[0];
+ document.getElementById('kSay').textContent=`Kart ${ki+1} / ${K.length}`;
+ document.getElementById('kBar').style.width=(ki/K.length*100)+'%'}
+kYuz.onclick=()=>{acik=!acik;kGoster()};
+document.getElementById('kTamam').onclick=()=>{if(ki<K.length-1){ki++;acik=false;kGoster()}else{kYuz.innerHTML=`<div>Bitti! 🎉<br><span class="muted">Tekrar için Karıştır.</span></div>`;document.getElementById('kBar').style.width='100%'}};
+document.getElementById('kBil').onclick=()=>{K.push(K[ki]);ki++;acik=false;kGoster()};
+document.getElementById('kGeri').onclick=()=>{if(ki>0){ki--;acik=false;kGoster()}};
+document.getElementById('kKar').onclick=()=>{K=kar(K0);ki=0;acik=false;kGoster()};
+kGoster();
+
+// eşleştirme
+let mSol=null,mSag=null,mHata=0,mKalan=0;
+function mKur(){const box=document.getElementById('mBox');box.innerHTML='';mHata=0;mKalan=A.length;document.getElementById('mSonuc').textContent='';
+ const sol=kar(A),sag=kar(A);
+ for(let i=0;i<A.length;i++){
+  const l=document.createElement('button');l.textContent=`${sol[i].ad} (${sol[i].yil})`;l.dataset.k=sol[i].ad;l.dataset.y='l';
+  const r=document.createElement('button');r.textContent=sag[i].yo;r.dataset.k=sag[i].ad;r.dataset.y='r';r.style.fontSize='.9rem';
+  box.append(l,r)}
+ mSol=mSag=null}
+document.getElementById('mBox').onclick=e=>{const b=e.target;if(b.tagName!=='BUTTON'||b.classList.contains('done'))return;
+ if(b.dataset.y==='l'){mSol?.classList.remove('sel');mSol=b}else{mSag?.classList.remove('sel');mSag=b}
+ b.classList.add('sel');
+ if(mSol&&mSag){if(mSol.dataset.k===mSag.dataset.k){[mSol,mSag].forEach(x=>{x.classList.remove('sel');x.classList.add('done')});mKalan--;
+   if(!mKalan)document.getElementById('mSonuc').textContent=mHata?`Tamam! ${mHata} hata yaptın — tekrar dene.`:'Kusursuz! Hiç hata yok.'}
+  else{mHata++;const a=mSol,c=mSag;[a,c].forEach(x=>x.classList.add('wrong'));setTimeout(()=>[a,c].forEach(x=>x.classList.remove('wrong','sel')),600)}
+  mSol=mSag=null}};
+document.getElementById('mYeni').onclick=mKur;mKur();
+
+// test
+const T0=[
+ ["Osmanlı Devleti'nin ilk büyük çaplı toprak kaybını yaşadığı antlaşma hangisidir?","Karlofça",["Pasarofça","İstanbul","Küçük Kaynarca"]],
+ ["Rusya'nın ilk kez Karadeniz'e inmesini sağlayan antlaşma hangisidir?","İstanbul (1700)",["Prut (1711)","Belgrad (1739)","Karlofça (1699)"]],
+ ["Karlofça ile kaybedilen toprakları geri alma ümidinin doğduğu antlaşma?","Prut",["Pasarofça","Belgrad","İstanbul"]],
+ ["Lâle Devri'nin başlamasına yol açan antlaşma hangisidir?","Pasarofça",["Karlofça","Belgrad","Prut"]],
+ ["Karadeniz'in Türk gölü olduğunu belirten son antlaşma hangisidir?","Belgrad (1739)",["Küçük Kaynarca (1774)","Prut (1711)","İstanbul (1700)"]],
+ ["Fransa'ya verilen kapitülasyonlar hangi antlaşmadan sonra sürekli hâle geldi?","Belgrad",["Pasarofça","Karlofça","Küçük Kaynarca"]],
+ ["Osmanlı'nın ilk kez savaş tazminatı ödediği antlaşma?","Küçük Kaynarca",["Karlofça","Pasarofça","Prut"]],
+ ["Halkı Türk ve Müslüman olan bir toprağın ilk kez kaybedildiği antlaşma?","Küçük Kaynarca (Kırım)",["Karlofça (Mora)","Pasarofça (Belgrad)","İstanbul (Azak)"]],
+ ["Halifeliğin siyasi gücü ilk kez hangi antlaşmada kullanıldı?","Küçük Kaynarca",["Belgrad","Prut","Karlofça"]],
+ ["Aşağıdakilerden hangisi Kutsal İttifak üyesi DEĞİLDİR?","Fransa",["Venedik","Malta","Lehistan"]],
+ ["Kutsal İttifak savaşlarının (1683–1699) en önemli sonucu nedir?","Osmanlı taarruz gücünü kaybetti, savunma dönemi başladı",["Lâle Devri başladı","Rusya Karadeniz'e indi","Kırım bağımsız oldu"]],
+ ["Karlofça'da Mora hangi devlete bırakıldı?","Venedik",["Avusturya","Lehistan","Rusya"]],
+ ["Lâle Devri hangi olayla sona erdi?","Patrona Halil İsyanı",["Pasarofça Antlaşması","Belgrad Antlaşması","II. Viyana Kuşatması"]],
+ ["Lâle Devri'nin sadrazamı kimdir?","Nevşehirli Damat İbrahim Paşa",["Merzifonlu Kara Mustafa Paşa","Yirmisekiz Mehmed Çelebi","İbrahim Müteferrika"]],
+ ["İlk Türk matbaasında basılan ilk eser?","Vankulu Lügati",["Sefaretname","Kur'an-ı Kerim","Divan-ı Lügati't-Türk"]],
+ ["Matbaada dinî eserlerin basılmamasının nedeni?","Hattatların işsiz kalmaması",["Ulemanın matbaayı yasaklaması","Kâğıt yetersizliği","Padişahın emri yoktu"]],
+ ["Aşağıdakilerden hangisi Lâle Devri'nde YAPILMAMIŞTIR?","Askerî alanda yeni ocak kurulması",["Tulumbacı Ocağı'nın kurulması","Çiçek aşısının uygulanması","Yalova'da kâğıt imalathanesi açılması"]],
+ ["Avrupa'ya geçici elçiler göndermenin sonucu nedir?","Sefaretnamelerle Batı tarzı yaşam ve mimari Osmanlı'ya taşındı",["Kapitülasyonlar kaldırıldı","Daimi elçilikler açıldı","Kutsal İttifak dağıldı"]],
+ ["Mimaride Batı (Barok/Rokoko) etkisinin ilk görüldüğü dönem?","Lâle Devri",["Kutsal İttifak savaşları","Küçük Kaynarca sonrası","II. Viyana Kuşatması dönemi"]],
+ ["İstanbul yangınlarına karşı alınan kurumsal önlem?","Tulumbacı Ocağı",["Çiçek aşısı","Sadabad Kasrı","Sefaretname"]]
+];
+let T,ti,dogru,yanlislar;
+function tBasla(){T=kar(T0).map(q=>({s:q[0],d:q[1],o:kar([q[1],...q[2]])}));ti=0;dogru=0;yanlislar=[];tGoster()}
+function tGoster(){const box=document.getElementById('tBox');document.getElementById('tBar').style.width=(ti/T.length*100)+'%';
+ if(ti>=T.length){const p=Math.round(dogru/T.length*100);
+  box.innerHTML=`<h2>${dogru} / ${T.length} doğru — %${p}</h2><p>${p>=85?'Çok iyi, hazırsın!':p>=60?'İyi, yanlışlarına bir göz at.':'Notlar ve Kartlar ile tekrar et.'}</p>`+
+  (yanlislar.length?'<h3>Yanlışların</h3>'+yanlislar.map(q=>`<p><b>${q.s}</b><br><span style="color:var(--ok)">✓ ${q.d}</span></p>`).join(''):'')+
+  `<button class="btn" onclick="tBasla()">Yeniden başla</button>`;
+  try{localStorage.setItem('enIyi',Math.max(p,+localStorage.getItem('enIyi')||0))}catch(_){}return}
+ const q=T[ti];
+ box.innerHTML=`<div class="muted">Soru ${ti+1} / ${T.length}</div><h3 style="color:var(--ink);margin:8px 0 10px">${q.s}</h3>`+q.o.map(o=>`<button class="opt">${o}</button>`).join('')+'<div id="tAlt"></div>';
+ box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+  box.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x.textContent===q.d)x.classList.add('ok')});
+  if(b.textContent===q.d)dogru++;else{b.classList.add('bad');yanlislar.push(q)}
+  document.getElementById('tAlt').innerHTML='<button class="btn" style="margin-top:8px">Sonraki →</button>';
+  document.querySelector('#tAlt button').onclick=()=>{ti++;tGoster()}})}
+tBasla();
+</script>
+</body>
+</html>
