@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MatVerse — EBOB EKOK</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>➗</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+/* tasarım: ChemiVerse (pca/design.md) brütalist sistemi */
+:root{
+  --color-paper:oklch(94.9% 0.013 92);--color-paper-2:oklch(90.6% 0.016 92);--color-white:oklch(100% 0 0);
+  --color-ink:oklch(14.5% 0 0);--color-ink-soft:oklch(40% 0.008 92);--color-grid:oklch(14.5% 0 0 / 0.1);
+  --color-yellow:oklch(91.5% 0.19 104);--color-red:oklch(62% 0.235 35);--color-green:oklch(75% 0.2 150);--color-blue:oklch(52% 0.27 268);
+  --color-disabled:oklch(78% 0.012 92);--color-disabled-ink:oklch(45% 0.012 92);
+  --font-display:"Archivo Black",Impact,sans-serif;--font-body:"JetBrains Mono",ui-monospace,monospace;
+  --space-3xs:.25rem;--space-2xs:.5rem;--space-xs:.75rem;--space-sm:1rem;--space-md:1.5rem;--space-lg:2rem;--space-xl:3rem;
+  --text-xs:.6875rem;--text-sm:.8125rem;--text-md:1rem;--text-lg:1.375rem;--text-xl:clamp(1.5rem,3vw,2.25rem);--text-2xl:clamp(2rem,5vw,3.5rem);
+  --rule:3px solid var(--color-ink);--rule-thin:2px solid var(--color-ink);
+  --shadow:6px 6px 0 var(--color-ink);--shadow-sm:4px 4px 0 var(--color-ink);--shadow-lift:8px 8px 0 var(--color-ink);
+  --ease-out:cubic-bezier(0.16,1,0.3,1);--dur-press:80ms;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{overflow-x:clip}
+body{margin:0;background:var(--color-paper);color:var(--color-ink);font:400 var(--text-md)/1.5 var(--font-body);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--color-blue);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* shell */
+.shell{min-height:100vh;display:flex;flex-direction:column}
+.masthead{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-sm);padding:var(--space-sm) var(--space-md);border-bottom:var(--rule)}
+.wordmark{margin:0;font:400 clamp(1.5rem,4vw,2.5rem)/.9 var(--font-display);text-transform:uppercase;letter-spacing:-.02em}
+.wordmark span{display:inline-block;background:var(--color-yellow);border:var(--rule);padding:0 .12em;transform:rotate(-2deg)}
+.tabs{display:flex;border:var(--rule);box-shadow:var(--shadow-sm);background:var(--color-white)}
+.tab{border:0;border-right:var(--rule);background:transparent;cursor:pointer;padding:var(--space-2xs) var(--space-sm);font:400 var(--text-sm)/1.1 var(--font-display);text-transform:uppercase;white-space:nowrap}
+.tab:last-child{border-right:0}
+.tab:hover{background:var(--color-paper-2)}
+.tab[aria-selected="true"]{background:var(--color-ink);color:var(--color-yellow)}
+.tab small{font:700 var(--text-xs) var(--font-body);margin-right:var(--space-3xs)}
+.tally{border:var(--rule);background:var(--color-ink);color:var(--color-yellow);padding:var(--space-3xs) var(--space-xs);font:800 var(--text-sm) var(--font-body);text-transform:uppercase;white-space:nowrap}
+.footer{margin-top:auto;border-top:var(--rule);padding:var(--space-xs) var(--space-md);display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2xs);font-size:var(--text-xs);font-weight:700;text-transform:uppercase}
+
+/* blocks */
+.bench{display:grid;gap:var(--space-md);padding:var(--space-md);align-items:start;grid-template-columns:15rem minmax(0,1fr) 21rem}
+.bench.two{grid-template-columns:15rem minmax(0,1fr)}
+.panel{background:var(--color-white);border:var(--rule);box-shadow:var(--shadow);padding:var(--space-sm);min-width:0}
+.label{display:inline-block;margin:0 0 var(--space-xs);padding:2px var(--space-2xs);background:var(--color-ink);color:var(--color-paper);font:800 var(--text-xs) var(--font-body);letter-spacing:.1em;text-transform:uppercase}
+.hint{font-size:var(--text-xs);color:var(--color-ink-soft);margin:var(--space-2xs) 0 0}
+.big{font:400 var(--text-2xl)/.95 var(--font-display);margin:0;overflow-wrap:anywhere}
+.subhead{font:400 var(--text-lg)/1.1 var(--font-display);text-transform:uppercase;margin:var(--space-2xs) 0}
+.stage{border:var(--rule);box-shadow:var(--shadow);background-color:var(--color-paper);padding:var(--space-md);min-width:0;
+  background-image:linear-gradient(var(--color-grid) 1px,transparent 1px),linear-gradient(90deg,var(--color-grid) 1px,transparent 1px);background-size:40px 40px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-3xs);border:var(--rule);background:var(--color-white);color:var(--color-ink);cursor:pointer;
+  padding:var(--space-2xs) var(--space-xs);box-shadow:var(--shadow-sm);font:400 var(--text-sm)/1 var(--font-display);text-transform:uppercase;white-space:nowrap;min-height:2.5rem;
+  transition:transform var(--dur-press) var(--ease-out),box-shadow var(--dur-press) var(--ease-out)}
+.btn:hover:not(:disabled){transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--color-ink)}
+.btn:active:not(:disabled){transform:translate(4px,4px);box-shadow:0 0 0 var(--color-ink)}
+.btn:disabled{background:var(--color-disabled);color:var(--color-disabled-ink);box-shadow:none;cursor:not-allowed}
+.btn-primary{background:var(--color-red);color:var(--color-white)}
+.btn-yellow{background:var(--color-yellow)}
+.btn.is-on{background:var(--color-ink);color:var(--color-yellow)}
+.btn-big{width:100%;padding:var(--space-sm);font-size:var(--text-lg);box-shadow:var(--shadow)}
+.btn-big:hover:not(:disabled){box-shadow:var(--shadow-lift)}
+.toolbar{display:flex;flex-wrap:wrap;gap:var(--space-xs);margin-bottom:var(--space-sm)}
+.stack{display:grid;gap:var(--space-2xs)}
+.stack .btn{justify-content:flex-start;width:100%;white-space:normal;text-align:left;min-width:0}
+.stack .btn small{font:700 var(--text-xs) var(--font-body);margin-right:var(--space-3xs)}
+.field{width:100%;border:var(--rule);background:var(--color-white);padding:var(--space-2xs) var(--space-xs);font:800 var(--text-lg) var(--font-body);box-shadow:var(--shadow-sm);min-height:2.75rem}
+.field-row{display:grid;gap:var(--space-2xs);margin-bottom:var(--space-sm)}
+.field-row label{font:800 var(--text-xs) var(--font-body);text-transform:uppercase;letter-spacing:.1em}
+.status-line{min-height:1.6rem;margin:var(--space-xs) 0 0;font-weight:700;font-size:var(--text-sm)}
+.status-line.is-error{background:var(--color-red);color:var(--color-white);border:var(--rule);padding:2px var(--space-2xs)}
+.stamp{display:inline-block;margin:var(--space-xs) 0;padding:var(--space-3xs) var(--space-xs);border:var(--rule);font:400 var(--text-md) var(--font-display);text-transform:uppercase;transform:rotate(-2deg)}
+.stamp.ok{background:var(--color-yellow)}.stamp.bad{background:var(--color-red);color:var(--color-white)}.stamp.new{background:var(--color-green)}
+.facts{width:100%;border-collapse:collapse;margin:var(--space-xs) 0;font-size:var(--text-sm)}
+.facts th,.facts td{border-bottom:var(--rule-thin);padding:var(--space-3xs) 0;text-align:left;vertical-align:top}
+.facts td{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+.target{border:var(--rule);background:var(--color-yellow);padding:var(--space-xs);margin-top:var(--space-sm)}
+.target p{margin:0;font-size:var(--text-xs);font-weight:700;text-transform:uppercase}
+.target strong{display:block;font:400 var(--text-lg)/1.1 var(--font-display);margin:4px 0;overflow-wrap:anywhere}
+.note{border:var(--rule-thin);background:var(--color-paper);padding:var(--space-2xs);font-size:var(--text-xs);margin-top:var(--space-2xs)}
+.story{border-left:6px solid var(--color-ink);padding:2px 0 2px var(--space-2xs);margin:var(--space-sm) 0}
+.story b{display:block;font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.06em}
+.story p{margin:2px 0 0;font-size:var(--text-sm)}
+.story.is-fact{border-left-color:var(--color-yellow);background:var(--color-paper)}
+.story.is-hazard{border-left-color:var(--color-red)}
+.meter{height:14px;border:var(--rule-thin);background:var(--color-paper);margin:4px 0 var(--space-2xs)}
+.meter span{display:block;height:100%;background:var(--color-ink)}
+.meter.close span{background:var(--color-green)}
+sup{font-size:.65em}
+
+/* lesson */
+.article{max-width:46rem}
+.article h2{font:400 var(--text-xl)/1 var(--font-display);text-transform:uppercase;letter-spacing:-.02em;margin:0 0 var(--space-sm)}
+.article h3{font:400 var(--text-md)/1.1 var(--font-display);text-transform:uppercase;margin:var(--space-md) 0 var(--space-2xs)}
+.article p{margin:0 0 var(--space-xs);font-size:.95rem}
+.calc{border:var(--rule-thin);background:var(--color-white);padding:var(--space-xs);margin:var(--space-xs) 0;font:700 var(--text-md)/1.6 var(--font-body);white-space:pre-wrap;box-shadow:var(--shadow-sm)}
+.calc u{text-decoration:none;background:var(--color-yellow);padding:0 3px;border:2px solid var(--color-ink)}
+.rule-card{border:var(--rule);background:var(--color-yellow);padding:var(--space-xs);margin:var(--space-xs) 0;font-weight:700}
+.rule-card b{font-family:var(--font-display);font-weight:400;text-transform:uppercase}
+
+/* ladder */
+.ladder{border-collapse:collapse;font:800 clamp(1.25rem,3vw,1.75rem)/1.3 var(--font-body);background:var(--color-white);border:var(--rule);box-shadow:var(--shadow-sm)}
+.ladder td{padding:2px 16px;text-align:right;font-variant-numeric:tabular-nums}
+.ladder td.p{border-left:var(--rule);text-align:left;min-width:4.5rem}
+.ladder tr.all td.p{background:var(--color-yellow)}
+.ladder tr.last td{color:var(--color-ink-soft)}
+.ladder tr{border-bottom:2px solid var(--color-grid)}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-2xs) var(--space-sm);margin-top:var(--space-sm);font-size:var(--text-xs);font-weight:700;text-transform:uppercase}
+.legend i{display:inline-block;width:16px;height:16px;border:var(--rule-thin);background:var(--color-yellow);vertical-align:-3px;margin-right:6px}
+.factrow{margin-top:var(--space-sm);font-weight:700;font-size:var(--text-sm)}
+
+/* practice / test */
+.question{font:400 var(--text-xl)/1.1 var(--font-display);text-transform:uppercase;margin:var(--space-2xs) 0 var(--space-md);overflow-wrap:anywhere}
+.qtext{font-size:1rem;font-weight:700;margin:var(--space-2xs) 0 var(--space-md);line-height:1.6}
+.answer-row{display:flex;gap:var(--space-xs);flex-wrap:wrap}
+.answer-row .field{width:10rem;flex:none}
+.opts{display:grid;gap:var(--space-xs)}
+.opts .btn{justify-content:flex-start;font:700 var(--text-md)/1.3 var(--font-body);text-transform:none;white-space:normal;text-align:left;padding:var(--space-xs)}
+.opts .btn b{font-family:var(--font-display);font-weight:400;margin-right:var(--space-2xs)}
+.opts .btn.right{background:var(--color-green)}
+.opts .btn.wrong{background:var(--color-red);color:var(--color-white)}
+.explain{border:var(--rule);background:var(--color-white);padding:var(--space-xs);margin-top:var(--space-sm);font-size:var(--text-sm);font-weight:700}
+
+/* game */
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--space-2xs)}
+.tile{aspect-ratio:1;border:var(--rule-thin);background:var(--color-white);cursor:pointer;display:grid;place-items:center;padding:0;min-width:0;font:400 var(--text-lg)/1 var(--font-display);
+  transition:transform var(--dur-press) var(--ease-out),box-shadow var(--dur-press) var(--ease-out)}
+.tile:hover:not(:disabled){transform:translate(-2px,-2px);box-shadow:var(--shadow-sm)}
+.tile:active:not(:disabled){transform:translate(1px,1px);box-shadow:none}
+.tile.hit{background:var(--color-yellow);box-shadow:var(--shadow-sm)}
+.tile.miss{background:var(--color-red);color:var(--color-white)}
+.tile:disabled{cursor:default}
+.lives{font:400 var(--text-lg) var(--font-display);color:var(--color-red);letter-spacing:.1em}
+
+@media (max-width:1100px){
+  .bench{grid-template-columns:13rem minmax(0,1fr)}
+  .bench>.result{grid-column:1/-1}
+}
+@media (max-width:720px){
+  .masthead{padding:var(--space-xs) var(--space-sm)}
+  .tabs{width:100%;overflow-x:auto;order:3}
+  .tab{flex:1;padding:var(--space-2xs) var(--space-3xs);font-size:var(--text-xs)}
+  .tab small{display:none}
+  .bench,.bench.two{grid-template-columns:minmax(0,1fr);padding:var(--space-sm)}
+  .bench>.picker{order:0}.bench>.work{order:1}.bench>.result{order:2}
+  .stack{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stage{padding:var(--space-sm)}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .ladder td{padding:2px 10px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:0ms!important;animation-duration:0ms!important}
+  .btn:hover:not(:disabled),.tile:hover:not(:disabled){transform:none}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="masthead">
+    <h1 class="wordmark">Mat<span>verse</span></h1>
+    <nav class="tabs" role="tablist" aria-label="Bölümler" id="tabs"></nav>
+    <span class="tally" id="xp" title="Toplam puan">XP 0</span>
+  </header>
+  <main id="view"></main>
+  <footer class="footer">
+    <span>8. sınıf · EBOB ve EKOK</span>
+    <span>Çarpanlar ve katlar · LGS hazırlık</span>
+  </footer>
+</div>
+
+<script>
+/* ---------- matematik ---------- */
+const gcd=(a,b)=>{while(b)[a,b]=[b,a%b];return a};
+const lcm=(a,b)=>a/gcd(a,b)*b;
+const gcdN=a=>a.reduce(gcd),lcmN=a=>a.reduce(lcm);
+function factor(n){const f={};let p=2;while(n>1&&p*p<=n){while(n%p===0){f[p]=(f[p]||0)+1;n/=p}p++}if(n>1)f[n]=(f[n]||0)+1;return f}
+const factHTML=n=>n===1?'1':Object.entries(factor(n)).map(([p,e])=>e>1?`${p}<sup>${e}</sup>`:p).join(' · ');
+const divisors=n=>{const d=[];for(let i=1;i<=n;i++)if(n%i===0)d.push(i);return d};
+function ladder(nums){const rows=[];let cur=[...nums],p=2;
+  while(cur.some(x=>x>1)){if(cur.some(x=>x%p===0)){rows.push({vals:[...cur],p,all:cur.every(x=>x%p===0)});cur=cur.map(x=>x%p===0?x/p:x)}else p++}
+  rows.push({vals:cur,p:null});return rows}
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* ---------- XP ---------- */
+let XP=0;try{XP=+localStorage.getItem('matverse8:xp')||0}catch(e){}
+function addXP(n){XP+=n;try{localStorage.setItem('matverse8:xp',XP)}catch(e){}$('#xp').textContent=`XP ${XP}`}
+addXP(0);
+
+/* ---------- sekmeler ---------- */
+const TABS=[
+ {id:'konu',no:'01',t:'Konu',r:viewLesson},
+ {id:'merdiven',no:'02',t:'Merdiven',r:viewLadder},
+ {id:'alistirma',no:'03',t:'Alıştırma',r:viewPractice},
+ {id:'test',no:'04',t:'LGS test',r:viewTest},
+ {id:'oyun',no:'05',t:'Bölen avı',r:viewGame},
+];
+let gameTimer=null;
+function go(id){
+  clearInterval(gameTimer);
+  $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.id===id));
+  const v=$('#view');v.innerHTML='';TABS.find(x=>x.id===id).r(v);
+  try{localStorage.setItem('matverse8:tab',id)}catch(e){}
+}
+TABS.forEach(x=>{const b=document.createElement('button');b.className='tab';b.type='button';b.role='tab';b.dataset.id=x.id;b.innerHTML=`<small>${x.no}</small>${x.t}`;b.onclick=()=>go(x.id);$('#tabs').appendChild(b)});
+
+/* ---------- 01 konu ---------- */
+const LESSONS=[
+['Çarpan ve kat',`<h2>Çarpanlar ve katlar</h2>
+<p>Bir sayıyı <b>kalansız bölen</b> doğal sayılar o sayının <b>çarpanlarıdır</b> (bölenleridir).</p>
+<div class="calc">12 = 1·12 = 2·6 = 3·4
+12'nin çarpanları: 1, 2, 3, 4, 6, 12</div>
+<p>Bir sayıyı 1, 2, 3, … ile çarpınca bulunan sayılar o sayının <b>katlarıdır</b>.</p>
+<div class="calc">4'ün katları: 4, 8, 12, 16, 20, …</div>
+<div class="story is-fact"><b>Unutma</b><p>Çarpanlar sınırlıdır, katlar sonsuza kadar gider. Her sayı kendisinin hem çarpanı hem katıdır.</p></div>
+<h3>Kısa yol: çarpım çiftleri</h3>
+<p>1'den başla, çarpım çiftlerini yaz. Çiftler tekrar etmeye başlayınca dur.</p>
+<div class="calc">36: 1·36  2·18  3·12  4·9  6·6  ← dur
+Çarpanlar: 1, 2, 3, 4, 6, 9, 12, 18, 36</div>`],
+['Asal çarpanlar',`<h2>Asal çarpanlar</h2>
+<p><b>Asal sayı</b> 1'den büyüktür ve yalnızca 1'e ve kendisine bölünür.</p>
+<div class="calc">2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47 …</div>
+<div class="story is-hazard"><b>Tuzak</b><p>1 asal değildir. 2, çift olan tek asal sayıdır.</p></div>
+<h3>Asal çarpanlara ayırma</h3>
+<p>Sayıyı en küçük asaldan başlayarak bölmeye devam et:</p>
+<div class="calc">60 | 2
+30 | 2
+15 | 3
+ 5 | 5
+ 1 |
+60 = 2² · 3 · 5</div>
+<h3>Bölen sayısı (LGS'de çıkar)</h3>
+<p>Üslerin birer fazlasını çarp.</p>
+<div class="rule-card">60 = 2² · 3¹ · 5¹  →  (2+1)·(1+1)·(1+1) = 12 pozitif bölen</div>`],
+['EBOB',`<h2>EBOB — en büyük ortak bölen</h2>
+<p>Sayıların <b>hepsini birden bölen en büyük</b> sayı.</p>
+<h3>Yol 1 · bölenleri listele</h3>
+<div class="calc">12: 1, 2, 3, 4, <u>6</u>, 12
+18: 1, 2, 3, <u>6</u>, 9, 18
+Ortak: 1, 2, 3, 6  →  EBOB = 6</div>
+<h3>Yol 2 · bölen merdiveni</h3>
+<p>Sayıların <b>hepsini birden bölen</b> satırları çarp.</p>
+<div class="calc">12  18 | 2  ✔
+ 6   9 | 2
+ 3   9 | 3  ✔
+ 1   3 | 3
+ 1   1 |
+EBOB = 2 · 3 = 6</div>
+<h3>Yol 3 · asal çarpanlar</h3>
+<div class="rule-card"><b>Ortak</b> asalların <b>küçük</b> üslüsünü al. 12 = 2²·3, 18 = 2·3² → EBOB = 2·3 = 6</div>
+<div class="story is-fact"><b>Problemde ipucu</b><p>"En büyük", "eş parçalara böl", "kes", "paylaştır", "karıştırmadan doldur" → çoğunlukla EBOB.</p></div>`],
+['EKOK',`<h2>EKOK — en küçük ortak kat</h2>
+<p>Sayıların <b>hepsinin katı olan en küçük</b> sayı (0 hariç).</p>
+<h3>Yol 1 · katları listele</h3>
+<div class="calc">4: 4, 8, <u>12</u>, 16, 20, 24
+6: 6, <u>12</u>, 18, 24
+EKOK = 12</div>
+<h3>Yol 2 · bölen merdiveni</h3>
+<p>Merdivendeki <b>bütün</b> bölenleri çarp.</p>
+<div class="calc">4  6 | 2
+2  3 | 2
+1  3 | 3
+1  1 |
+EKOK = 2 · 2 · 3 = 12</div>
+<h3>Yol 3 · asal çarpanlar</h3>
+<div class="rule-card"><b>Bütün</b> asalları <b>büyük</b> üslüsüyle al. 12 = 2²·3, 18 = 2·3² → EKOK = 2²·3² = 36</div>
+<div class="story is-fact"><b>Problemde ipucu</b><p>"En az", "en küçük", "aynı anda", "tekrar birlikte", "parçaları birleştirip kare yap" → çoğunlukla EKOK.</p></div>`],
+['Aralarında asal',`<h2>Aralarında asal sayılar</h2>
+<p>1'den başka ortak böleni olmayan sayılar. Yani <b>EBOB = 1</b>.</p>
+<div class="calc">8 = 2³   15 = 3 · 5
+Ortak asal yok → 8 ile 15 aralarında asal</div>
+<div class="story is-fact"><b>Bilgi</b><p>Ardışık iki sayı her zaman aralarında asaldır (14 ve 15). Aralarında asal iki sayının EKOK'u çarpımlarıdır: 8·15 = 120.</p></div>
+<h3>Altın kural</h3>
+<div class="rule-card" style="font-size:1.25rem">EBOB(a, b) · EKOK(a, b) = a · b</div>
+<div class="calc">EBOB = 6, EKOK = 72, a = 18
+b = 6 · 72 / 18 = 24</div>
+<div class="story is-hazard"><b>Dikkat</b><p>Bu kural yalnızca iki sayı için geçerli.</p></div>`],
+['Problem tipleri',`<h2>LGS problem tipleri</h2>
+<div class="story"><b>Dikdörtgeni eş karelere böl → EBOB</b><p>24×36 cm: en büyük kare 12 cm. Kare sayısı (24/12)·(36/12) = 6.</p></div>
+<div class="story"><b>Dikdörtgenleri birleştirip kare yap → EKOK</b><p>6×8 cm kartonlar: kare kenarı 24 cm. Karton (24/6)·(24/8) = 12.</p></div>
+<div class="story"><b>Aynı anda / tekrar birlikte → EKOK</b><p>12 dk ve 18 dk arayla kalkan otobüsler 09:00'da birlikte → 36 dk sonra, 09:36.</p></div>
+<div class="story"><b>Karıştırmadan eşit kaplara doldur → EBOB</b><p>60 L ve 84 L: kap 12 L, kap sayısı 5 + 7 = 12.</p></div>
+<div class="story"><b>Hep aynı kalan → EKOK + kalan</b><p>4, 6 ve 8'e bölününce hep 3 kalan: 24 + 3 = 27.</p></div>
+<div class="story"><b>Çevreye eşit aralıkla ağaç → EBOB</b><p>120×80 m bahçe: aralık 40 m, ağaç = çevre / aralık = 400 / 40 = 10.</p></div>
+<div class="story is-hazard"><b>Tuzak</b><p>Kapalı şeklin çevresine dikerken ağaç = çevre ÷ aralık. Düz bir yola dikerken ağaç = uzunluk ÷ aralık <b>+ 1</b>.</p></div>`]
+];
+let lessonIdx=0;try{lessonIdx=+localStorage.getItem('matverse8:lesson')||0}catch(e){}
+function viewLesson(v){
+  v.innerHTML=`<div class="bench two"><aside class="panel picker"><p class="label">Başlıklar</p><div class="stack" id="lnav"></div>
+  <div class="target"><p>Sıradaki adım</p><strong>Merdivende dene</strong><button class="btn btn-yellow" style="width:100%;margin-top:6px" id="toLad">02 · Merdiven</button></div></aside>
+  <section class="stage work"><article class="article" id="lart"></article></section></div>`;
+  const nav=$('#lnav'),art=$('#lart');
+  const show=i=>{lessonIdx=i;try{localStorage.setItem('matverse8:lesson',i)}catch(e){}$$('.btn',nav).forEach((b,j)=>b.classList.toggle('is-on',j===i));art.innerHTML=LESSONS[i][1]};
+  LESSONS.forEach(([n],i)=>{const b=document.createElement('button');b.className='btn';b.type='button';b.innerHTML=`<small>${String(i+1).padStart(2,'0')}</small>${n}`;b.onclick=()=>show(i);nav.appendChild(b)});
+  $('#toLad').onclick=()=>go('merdiven');
+  show(Math.min(lessonIdx,LESSONS.length-1));
+}
+
+/* ---------- 02 merdiven ---------- */
+function viewLadder(v){
+  v.innerHTML=`<div class="bench"><aside class="panel picker"><p class="label">Sayılar</p>
+    <div class="field-row"><label for="n1">1. sayı</label><input class="field" id="n1" type="number" min="2" max="9999" value="24"></div>
+    <div class="field-row"><label for="n2">2. sayı</label><input class="field" id="n2" type="number" min="2" max="9999" value="36"></div>
+    <div class="field-row"><label for="n3">3. sayı (isteğe bağlı)</label><input class="field" id="n3" type="number" min="2" max="9999" placeholder="—"></div>
+    <div class="stack"><button class="btn btn-primary btn-big" id="solve">Çöz</button><button class="btn btn-yellow" id="dice">Rastgele sayılar</button></div>
+    <p class="hint">2 ile 9999 arası sayı gir.</p></aside>
+  <section class="work"><div class="stage"><p class="label">Bölen merdiveni</p><div id="lad"></div>
+    <div class="legend"><span><i></i>Hepsini bölen satır → EBOB'a girer</span></div></div>
+    <p class="status-line" id="lstat" role="status"></p></section>
+  <aside class="panel result" id="lres"></aside></div>`;
+  const ins=['#n1','#n2','#n3'].map(s=>$(s));
+  const solve=()=>{
+    const raw=ins.map(i=>i.value.trim()).filter(Boolean),nums=raw.map(Number);
+    const st=$('#lstat');
+    if(nums.length<2||nums.some(n=>!Number.isInteger(n)||n<2||n>9999)){st.className='status-line is-error';st.setAttribute('role','alert');st.textContent='En az iki sayı gir, her biri 2 ile 9999 arasında olsun.';return}
+    st.className='status-line';st.textContent=`${nums.join(', ')} için merdiven kuruldu: ${ladder(nums).length-1} basamak.`;
+    const rows=ladder(nums);
+    $('#lad').innerHTML=`<table class="ladder">${rows.map(r=>`<tr class="${r.all&&nums.length>1?'all':''} ${r.p===null?'last':''}">${r.vals.map(x=>`<td>${x}</td>`).join('')}<td class="p">${r.p??''}${r.all?' ✔':''}</td></tr>`).join('')}</table>`;
+    const eb=rows.filter(r=>r.all).map(r=>r.p),ek=rows.filter(r=>r.p).map(r=>r.p),E=gcdN(nums),K=lcmN(nums);
+    $('#lres').innerHTML=`<p class="label">Sonuç</p>
+      <p class="hint" style="margin:0">EBOB</p><p class="big">${E}</p><p class="hint">${eb.length?eb.join(' · '):'ortak bölen yok → 1'}</p>
+      <p class="hint" style="margin-top:var(--space-sm)">EKOK</p><p class="big">${K}</p><p class="hint">${ek.join(' · ')}</p>
+      ${E===1?'<span class="stamp new">Aralarında asal</span>':'<span class="stamp ok">Tamam</span>'}
+      <table class="facts">${nums.map(n=>`<tr><th>${n}</th><td>${factHTML(n)}</td></tr>`).join('')}
+      ${nums.length===2?`<tr><th>EBOB · EKOK</th><td>${E*K}</td></tr><tr><th>a · b</th><td>${nums[0]*nums[1]}</td></tr>`:''}</table>
+      ${nums.length===2?'<div class="note">İki sayıda EBOB · EKOK her zaman a · b\'ye eşittir.</div>':''}`;
+  };
+  $('#solve').onclick=solve;
+  $('#dice').onclick=()=>{const g=[2,3,4,5,6,8,12][rnd(0,6)];let x,y;do{x=rnd(2,9);y=rnd(2,9)}while(x===y);ins[0].value=g*x;ins[1].value=g*y;ins[2].value='';solve()};
+  ins.forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')solve()}));
+  solve();
+}
+
+/* ---------- 03 alıştırma ---------- */
+const MODES=[['karisik','Karışık'],['ebob','EBOB'],['ekok','EKOK'],['bolen','Bölen sayısı'],['iki','a · b kuralı']];
+function makeQ(mode){
+  const m=mode==='karisik'?['ebob','ekok','bolen','iki'][rnd(0,3)]:mode;
+  const fx=n=>factHTML(n);
+  if(m==='ebob'){const g=rnd(2,12);let x,y;do{x=rnd(1,8);y=rnd(2,9)}while(x===y||gcd(x,y)!==1);const a=g*x,b=g*y;return{q:`EBOB(${a}, ${b}) = ?`,ans:gcd(a,b),hint:`${a} = ${fx(a)}, ${b} = ${fx(b)}. Ortak asalların küçük üslüsünü çarp.`}}
+  if(m==='ekok'){let a,b;do{a=rnd(2,24);b=rnd(2,24)}while(a===b);return{q:`EKOK(${a}, ${b}) = ?`,ans:lcm(a,b),hint:`${a} = ${fx(a)}, ${b} = ${fx(b)}. Bütün asalları büyük üslüsüyle çarp.`}}
+  if(m==='bolen'){const n=[12,18,20,24,28,30,36,40,45,48,50,60,72,80,90,96,100][rnd(0,16)];return{q:`${n} sayısının kaç pozitif böleni var?`,ans:divisors(n).length,hint:`${n} = ${fx(n)} → ${Object.values(factor(n)).map(e=>`(${e}+1)`).join('·')}`}}
+  const g=rnd(2,8);let x,y;do{x=rnd(1,6);y=rnd(2,7)}while(x===y||gcd(x,y)!==1);const a=g*x,b=g*y,E=gcd(a,b),K=lcm(a,b);
+  return{q:`EBOB = ${E}, EKOK = ${K}, a = ${a} ise b = ?`,ans:b,hint:`EBOB · EKOK = a · b → b = ${E} · ${K} / ${a}`};
+}
+function viewPractice(v){
+  let mode='karisik',cur,right=0,wrong=0,streak=0,best=0,tries=0;
+  v.innerHTML=`<div class="bench"><aside class="panel picker"><p class="label">Soru türü</p><div class="stack" id="modes"></div></aside>
+  <section class="work"><div class="stage"><p class="label">Soru</p><p class="question" id="pq"></p>
+    <div class="answer-row"><input class="field" id="pa" type="number" inputmode="numeric" aria-label="Cevap" placeholder="?"><button class="btn btn-primary" id="pchk">Kontrol et</button><button class="btn btn-yellow" id="phint">İpucu</button><button class="btn" id="pnext">Atla</button></div>
+    <p class="status-line" id="pst" role="status"></p></div></section>
+  <aside class="panel result"><p class="label">Durum</p><div id="pstamp"></div><table class="facts" id="pfacts"></table><div class="note">İlk denemede doğru: 10 XP + seri bonusu. İkinci denemede: 4 XP.</div></aside></div>`;
+  MODES.forEach(([id,n])=>{const b=document.createElement('button');b.className='btn';b.type='button';b.textContent=n;b.dataset.m=id;b.onclick=()=>{mode=id;sync();next()};$('#modes').appendChild(b)});
+  const sync=()=>$$('#modes .btn').forEach(b=>b.classList.toggle('is-on',b.dataset.m===mode));
+  const facts=()=>{$('#pfacts').innerHTML=`<tr><th>Doğru</th><td>${right}</td></tr><tr><th>Yanlış</th><td>${wrong}</td></tr><tr><th>Seri</th><td>${streak}</td></tr><tr><th>En iyi seri</th><td>${best}</td></tr>`};
+  const st=(t,err)=>{const s=$('#pst');s.className='status-line'+(err?' is-error':'');s.setAttribute('role',err?'alert':'status');s.innerHTML=t};
+  const next=()=>{cur=makeQ(mode);tries=0;$('#pq').textContent=cur.q;$('#pa').value='';st('');$('#pstamp').innerHTML='';$('#pa').focus();facts()};
+  const check=()=>{const val=$('#pa').value.trim();if(!val)return;tries++;
+    if(+val===cur.ans){right++;streak++;best=Math.max(best,streak);const p=tries===1?10+Math.min(streak,5)*2:4;addXP(p);
+      $('#pstamp').innerHTML=`<span class="stamp ${streak>=3?'new':'ok'}">${streak>=3?`Seri ${streak}`:'Doğru'}</span>`;st(`Doğru, +${p} XP. Sıradaki soru geliyor.`);facts();setTimeout(next,1100)}
+    else{wrong++;streak=0;$('#pstamp').innerHTML='<span class="stamp bad">Yanlış</span>';facts();
+      st(tries>=2?`Cevap ${cur.ans}. ${cur.hint}`:'Olmadı, bir kez daha dene.',true)}};
+  $('#pchk').onclick=check;$('#pnext').onclick=next;$('#phint').onclick=()=>st('İpucu: '+cur.hint);
+  $('#pa').addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+  sync();next();
+}
+
+/* ---------- 04 LGS test ---------- */
+const BANK=[
+ {q:'Kenar uzunlukları 24 cm ve 36 cm olan dikdörtgen biçimindeki bir duvar, hiç boşluk kalmadan birbirine eş ve en büyük kare fayanslarla kaplanacaktır. Kaç fayans gerekir?',o:['6','12','4','9'],e:'Kare kenarı = EBOB(24, 36) = 12 cm. Fayans = (24/12)·(36/12) = 2·3 = 6.'},
+ {q:'Bir duraktan A otobüsü 12 dakikada bir, B otobüsü 18 dakikada bir kalkıyor. İkisi 09.00\'da birlikte kalktığına göre ilk kez tekrar ne zaman birlikte kalkarlar?',o:['09.36','09.30','10.12','09.54'],e:'EKOK(12, 18) = 36 dakika → 09.36.'},
+ {q:'60 litre zeytinyağı ve 84 litre ayçiçek yağı, karıştırılmadan eşit hacimli bidonlara hiç artmayacak şekilde doldurulacaktır. En az kaç bidon gerekir?',o:['12','5','7','24'],e:'Bidon en büyük olmalı: EBOB(60, 84) = 12 L. Bidon = 60/12 + 84/12 = 5 + 7 = 12.'},
+ {q:'4, 6 ve 8 ile bölündüğünde her seferinde 3 kalanını veren en küçük doğal sayı kaçtır?',o:['27','24','51','21'],e:'EKOK(4, 6, 8) = 24. Her birinden 3 fazla: 24 + 3 = 27.'},
+ {q:'Aşağıdaki sayı ikililerinden hangisi aralarında asaldır?',o:['9 ve 16','12 ve 18','14 ve 21','10 ve 25'],e:'9 = 3², 16 = 2⁴ → ortak asal yok, EBOB = 1. Diğerlerinin ortak böleni var (6, 7, 5).'},
+ {q:'İki doğal sayının EBOB\'u 6, EKOK\'u 72\'dir. Sayılardan biri 18 olduğuna göre diğeri kaçtır?',o:['24','12','36','4'],e:'EBOB · EKOK = a · b → 6 · 72 = 18 · b → b = 24.'},
+ {q:'Kenarları 120 m ve 80 m olan dikdörtgen bir bahçenin çevresine, köşelerde de birer ağaç olacak şekilde eşit aralıklarla ağaç dikilecektir. En az kaç ağaç gerekir?',o:['10','8','12','20'],e:'Aralık en büyük olmalı: EBOB(120, 80) = 40 m. Çevre 400 m. Ağaç = 400 / 40 = 10.'},
+ {q:'Bir kutudaki kalemler 5\'er 5\'er ve 6\'şar 6\'şar sayıldığında her seferinde 1 kalem artıyor. Kalem sayısı 50\'den fazla olduğuna göre en az kaçtır?',o:['61','31','91','56'],e:'EKOK(5, 6) = 30. Sayı = 30k + 1 → 31, 61, … 50\'den büyük en küçüğü 61.'},
+ {q:'36 sayısının kaç tane pozitif böleni vardır?',o:['9','6','8','12'],e:'36 = 2²·3² → (2+1)·(2+1) = 9 bölen.'},
+ {q:'Ayşe 3 günde bir, Ali 4 günde bir kütüphaneye gidiyor. İkisi bir pazartesi günü birlikte gittiyse ilk kez tekrar hangi gün birlikte giderler?',o:['Cumartesi','Pazartesi','Cuma','Perşembe'],e:'EKOK(3, 4) = 12 gün. 12 = 7 + 5 → pazartesiden 5 gün sonra cumartesi.'},
+ {q:'Ayrıtları 12 cm, 18 cm ve 24 cm olan dikdörtgenler prizması biçimindeki bir kutu, boşluk kalmadan eş küplerle doldurulacaktır. En az kaç küp gerekir?',o:['24','36','12','72'],e:'Küp en büyük olmalı: EBOB(12, 18, 24) = 6 cm. Küp sayısı = 2·3·4 = 24.'},
+ {q:'Kısa kenarı 6 cm, uzun kenarı 8 cm olan eş dikdörtgen kartonlar aynı yönde yan yana dizilerek kare oluşturulacaktır. En az kaç karton gerekir?',o:['12','24','48','6'],e:'Kare kenarı = EKOK(6, 8) = 24 cm. Karton = (24/6)·(24/8) = 4·3 = 12.'},
+ {q:'a bir doğal sayı, EBOB(a, 15) = 5 ve a &lt; 30 olduğuna göre a\'nın alabileceği değerlerin toplamı kaçtır?',o:['60','50','75','45'],e:'a, 5\'in katı olmalı ama 3\'ün katı olmamalı (yoksa EBOB 15 olur): 5, 10, 20, 25 → toplam 60.'},
+];
+function viewTest(v){
+  let order,i,correct,answered,log;
+  v.innerHTML=`<div class="bench two"><aside class="panel picker"><p class="label">Test</p><p class="hint" style="margin:0">Soru</p><p class="big" id="tno"></p>
+    <div class="meter" id="tmeter"><span></span></div><table class="facts" id="tfacts"></table><button class="btn" style="width:100%" id="trestart">Baştan başla</button></aside>
+  <section class="stage work" id="tstage"></section></div>`;
+  const start=()=>{order=shuffle([...BANK.keys()]).slice(0,10);i=0;correct=0;log=[];show()};
+  const side=()=>{$('#tno').textContent=`${Math.min(i+1,order.length)}/${order.length}`;$('#tmeter span').style.width=`${i/order.length*100}%`;
+    $('#tfacts').innerHTML=`<tr><th>Doğru</th><td>${correct}</td></tr><tr><th>Yanlış</th><td>${log.length-correct}</td></tr>`};
+  const show=()=>{side();const S=$('#tstage');
+    if(i>=order.length){$('#tmeter span').style.width='100%';$('#tmeter').classList.add('close');
+      S.innerHTML=`<p class="label">Sonuç</p><p class="big">${correct} / ${order.length}</p>
+      <span class="stamp ${correct>=8?'new':correct>=5?'ok':'bad'}">${correct>=8?'LGS\'ye hazır':correct>=5?'İyi gidiyor':'Konuya dön'}</span>
+      <p class="qtext">${correct>=8?'Çok iyi. Yanlış yaptığın sorunun çözümünü bir kez daha oku.':correct>=5?'Biraz daha pratikle tamam. Alıştırma sekmesinde EBOB ve EKOK sorularını çöz.':'01 · Konu sekmesindeki "Problem tipleri" sayfasını oku, sonra testi tekrar çöz.'}</p>
+      <div class="toolbar"><button class="btn btn-primary" id="again">Yeni test</button><button class="btn" id="toKonu">01 · Konu</button></div>`;
+      $('#again').onclick=start;$('#toKonu').onclick=()=>{lessonIdx=5;go('konu')};return}
+    const s=BANK[order[i]];answered=false;const opts=shuffle(s.o.map((t,k)=>({t,k})));
+    S.innerHTML=`<p class="label">Soru ${i+1}</p><p class="qtext">${s.q}</p><div class="opts">${opts.map((o,j)=>`<button class="btn" data-k="${o.k}"><b>${'ABCD'[j]})</b>${o.t}</button>`).join('')}</div><div id="tex"></div>`;
+    $$('.opts .btn',S).forEach(b=>b.onclick=()=>{if(answered)return;answered=true;const ok=+b.dataset.k===0;log.push(ok);if(ok){correct++;addXP(15)}
+      $$('.opts .btn',S).forEach(y=>{y.disabled=+y.dataset.k!==0&&y!==b;if(+y.dataset.k===0)y.classList.add('right')});if(!ok)b.classList.add('wrong');
+      $('#tex').innerHTML=`<span class="stamp ${ok?'ok':'bad'}">${ok?'Doğru +15 XP':'Yanlış'}</span><div class="explain">${s.e}</div><div class="toolbar" style="margin-top:var(--space-sm)"><button class="btn btn-primary" id="tnx">${i+1<order.length?'Sonraki soru':'Sonucu gör'}</button></div>`;
+      side();$('#tnx').onclick=()=>{i++;show()};$('#tnx').focus()});
+  };
+  $('#trestart').onclick=start;start();
+}
+
+/* ---------- 05 bölen avı ---------- */
+function viewGame(v){
+  let lives,score,round,left,need,found,A,B,common,best=0;try{best=+localStorage.getItem('matverse8:best')||0}catch(e){}
+  v.innerHTML=`<div class="bench"><aside class="panel picker"><p class="label">Kurallar</p>
+    <p style="margin:0 0 var(--space-xs);font-size:var(--text-sm);font-weight:700">İki sayının ortak bölenlerinin hepsini süre bitmeden bul.</p>
+    <p class="hint">Yanlış sayı 1 can götürür. 3 canın var. Kalan saniyeler bonus puan olur.</p>
+    <button class="btn btn-primary btn-big" id="gstart" style="margin-top:var(--space-sm)">Başla</button></aside>
+  <section class="work"><div class="stage"><p class="label" id="glabel">Bölen avı</p><p class="question" id="gq">Hazır mısın?</p><div class="tiles" id="gtiles"></div>
+    <p class="status-line" id="gst" role="status"></p></div></section>
+  <aside class="panel result"><p class="label">Skor</p><p class="big" id="gscore">0</p><p class="lives" id="glives" aria-label="Can"></p>
+    <p class="hint" style="margin:0">Süre</p><div class="meter" id="gtime"><span style="width:100%"></span></div>
+    <table class="facts" id="gfacts"></table><div id="gstamp"></div></aside></div>`;
+  const hud=()=>{$('#gscore').textContent=score??0;$('#glives').textContent='♥'.repeat(Math.max(lives||0,0))+'♡'.repeat(3-Math.max(lives||0,0));
+    $('#gfacts').innerHTML=`<tr><th>Tur</th><td>${round||0}</td></tr><tr><th>Bulunan</th><td>${found||0}/${need||0}</td></tr><tr><th>Rekor</th><td>${best}</td></tr>`};
+  const st=(t,err)=>{const s=$('#gst');s.className='status-line'+(err?' is-error':'');s.textContent=t};
+  const startGame=()=>{lives=3;score=0;round=0;$('#gstamp').innerHTML='';newRound()};
+  const newRound=()=>{
+    clearInterval(gameTimer);round++;
+    const g=[6,8,12,12,18,24,30,36][rnd(0,7)];let x,y;do{x=rnd(1,5);y=rnd(2,6)}while(x===y||gcd(x,y)!==1);
+    A=g*x;B=g*y;common=divisors(gcd(A,B));
+    const pool=new Set(common);while(pool.size<18)pool.add(rnd(1,Math.max(20,Math.min(A,B))));
+    need=common.length;found=0;const total=Math.max(12,25-round);left=total;
+    $('#glabel').textContent=`Tur ${round}`;$('#gq').innerHTML=`${A} ve ${B}`;st(`Hem ${A}'yı hem ${B}'yi bölen ${need} sayı var.`);
+    $('#gstart').textContent='Yeniden başla';
+    const T=$('#gtiles');T.innerHTML='';
+    shuffle([...pool]).forEach(n=>{const b=document.createElement('button');b.className='tile';b.type='button';b.textContent=n;b.onclick=()=>pick(b,n);T.appendChild(b)});
+    $('#gtime span').style.width='100%';$('#gtime').classList.remove('close');hud();
+    gameTimer=setInterval(()=>{left--;$('#gtime span').style.width=`${left/total*100}%`;if(left<=0){clearInterval(gameTimer);end(`Süre bitti. Ortak bölenler: ${common.join(', ')}.`)}},1000);
+  };
+  const pick=(b,n)=>{b.disabled=true;
+    if(A%n===0&&B%n===0){b.classList.add('hit');found++;score+=5;hud();
+      if(found===need){clearInterval(gameTimer);score+=left;addXP(10+left);$('#gtime').classList.add('close');hud();
+        st(`Tamam. EBOB(${A}, ${B}) = ${gcd(A,B)}, yani en büyük ortak bölen. Süre bonusu +${left}.`);
+        $('#gstamp').innerHTML=`<span class="stamp ok">Tur ${round} tamam</span><button class="btn btn-primary" style="width:100%" id="gnext">Sonraki tur</button>`;
+        $$('#gtiles .tile').forEach(t=>t.disabled=true);$('#gnext').onclick=()=>{$('#gstamp').innerHTML='';newRound()};$('#gnext').focus()}}
+    else{b.classList.add('miss');lives--;hud();st(`${n}, ${A%n?A:B} sayısını bölmüyor.`,true);if(lives<=0){clearInterval(gameTimer);end('Canın bitti.')}}};
+  const end=msg=>{$$('#gtiles .tile').forEach(t=>t.disabled=true);
+    const rec=score>best;if(rec){best=score;try{localStorage.setItem('matverse8:best',best)}catch(e){}}hud();
+    st(`${msg} Oyun bitti: ${score} puan.`,true);
+    $('#gstamp').innerHTML=`<span class="stamp ${rec?'new':'bad'}">${rec?'Yeni rekor':'Oyun bitti'}</span><button class="btn btn-primary" style="width:100%" id="gagain">Tekrar oyna</button>`;
+    $('#gagain').onclick=startGame};
+  $('#gstart').onclick=startGame;hud();
+}
+
+/* başlangıç */
+let first='konu';try{first=localStorage.getItem('matverse8:tab')||'konu'}catch(e){}
+if(location.hash)first=location.hash.slice(1);
+go(TABS.some(t=>t.id===first)?first:'konu');
+</script>
+</body>
+</html>
