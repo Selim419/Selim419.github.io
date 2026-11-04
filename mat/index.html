@@ -100,6 +100,7 @@ sup{font-size:.65em}
 .calc{border:var(--rule-thin);background:var(--color-white);padding:var(--space-xs);margin:var(--space-xs) 0;font:700 var(--text-md)/1.6 var(--font-body);white-space:pre-wrap;box-shadow:var(--shadow-sm)}
 .calc u{text-decoration:none;background:var(--color-yellow);padding:0 3px;border:2px solid var(--color-ink)}
 .rule-card{border:var(--rule);background:var(--color-yellow);padding:var(--space-xs);margin:var(--space-xs) 0;font-weight:700}
+.vid{display:block;width:100%;aspect-ratio:16/9;border:var(--rule);box-shadow:var(--shadow);background:var(--color-ink);margin:var(--space-sm) 0}
 .rule-card b{font-family:var(--font-display);font-weight:400;text-transform:uppercase}
 
 /* ladder */
@@ -211,6 +212,10 @@ TABS.forEach(x=>{const b=document.createElement('button');b.className='tab';b.ty
 
 /* ---------- 01 konu ---------- */
 const LESSONS=[
+['Video anlatım',`<h2>EBOB ve EKOK · video</h2>
+<p>İki dakikada iki örnek: duvarı fayansla kaplamak (EBOB) ve otobüslerin yeniden buluşması (EKOK).</p>
+<video class="vid" controls playsinline preload="metadata" poster="ebob-ekok.jpg" src="ebob-ekok.mp4"></video>
+<div class="story is-fact"><b>Sonra</b><p>Videodaki merdiveni 02 · Merdiven sekmesinde kendi sayılarınla dene.</p></div>`],
 ['Çarpan ve kat',`<h2>Çarpanlar ve katlar</h2>
 <p>Bir sayıyı <b>kalansız bölen</b> doğal sayılar o sayının <b>çarpanlarıdır</b> (bölenleridir).</p>
 <div class="calc">12 = 1·12 = 2·6 = 3·4
@@ -399,7 +404,7 @@ function viewTest(v){
       <span class="stamp ${correct>=8?'new':correct>=5?'ok':'bad'}">${correct>=8?'LGS\'ye hazır':correct>=5?'İyi gidiyor':'Konuya dön'}</span>
       <p class="qtext">${correct>=8?'Çok iyi. Yanlış yaptığın sorunun çözümünü bir kez daha oku.':correct>=5?'Biraz daha pratikle tamam. Alıştırma sekmesinde EBOB ve EKOK sorularını çöz.':'01 · Konu sekmesindeki "Problem tipleri" sayfasını oku, sonra testi tekrar çöz.'}</p>
       <div class="toolbar"><button class="btn btn-primary" id="again">Yeni test</button><button class="btn" id="toKonu">01 · Konu</button></div>`;
-      $('#again').onclick=start;$('#toKonu').onclick=()=>{lessonIdx=5;go('konu')};return}
+      $('#again').onclick=start;$('#toKonu').onclick=()=>{lessonIdx=6;go('konu')};return}
     const s=BANK[order[i]];answered=false;const opts=shuffle(s.o.map((t,k)=>({t,k})));
     S.innerHTML=`<p class="label">Soru ${i+1}</p><p class="qtext">${s.q}</p><div class="opts">${opts.map((o,j)=>`<button class="btn" data-k="${o.k}"><b>${'ABCD'[j]})</b>${o.t}</button>`).join('')}</div><div id="tex"></div>`;
     $$('.opts .btn',S).forEach(b=>b.onclick=()=>{if(answered)return;answered=true;const ok=+b.dataset.k===0;log.push(ok);if(ok){correct++;addXP(15)}
