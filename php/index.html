@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PHP Öğren</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:oklch(94.9% 0.013 92);--white:#fff;--ink:oklch(14.5% 0 0);--soft:oklch(40% 0.008 92);--yellow:oklch(91.5% 0.19 104);--red:oklch(62% 0.235 35);--green:oklch(75% 0.2 150);--blue:oklch(52% 0.27 268);
+--rule:3px solid var(--ink);--rule-thin:2px solid var(--ink);--shadow:6px 6px 0 var(--ink);--shadow-sm:4px 4px 0 var(--ink);--shadow-lift:8px 8px 0 var(--ink);--ease:cubic-bezier(.16,1,.3,1);
+--display:"Archivo Black",Impact,sans-serif;--body:"JetBrains Mono",ui-monospace,monospace;
+--bg:var(--paper);--card:var(--white);--acc:var(--red);--ok:var(--green);--bad:var(--red);--line:var(--ink)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:15px/1.6 var(--body);background:var(--paper);
+ background-image:linear-gradient(oklch(14.5% 0 0/.1) 1px,transparent 1px),linear-gradient(90deg,oklch(14.5% 0 0/.1) 1px,transparent 1px);background-size:40px 40px}
+header{padding:24px 16px 0;max-width:860px;margin:auto}
+h1{margin:0;font:400 clamp(2rem,6vw,3.4rem)/1 var(--display);text-transform:uppercase;letter-spacing:-.02em}
+h1 span{display:inline-block;background:var(--yellow);border:var(--rule);box-shadow:var(--shadow-sm);padding:2px 10px;transform:rotate(-2deg);margin-left:6px;font-size:.6em;vertical-align:middle}
+header p{margin:12px 0 0;font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.75rem}
+nav{display:flex;gap:10px;flex-wrap:wrap;max-width:860px;margin:20px auto 0;padding:0 16px}
+nav button,.btn,.opt,.match button{font-family:var(--display);text-transform:uppercase;border:var(--rule);box-shadow:var(--shadow-sm);cursor:pointer;transition:transform 80ms var(--ease),box-shadow 80ms var(--ease);color:var(--ink);border-radius:0}
+nav button{background:var(--white);padding:8px 14px;font-size:.85rem}
+nav button.on{background:var(--ink);color:var(--yellow)}
+nav button:hover,.btn:hover,.opt:not(:disabled):hover,.match button:not(.done):hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-lift)}
+nav button:active,.btn:active,.opt:active,.match button:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+main{max-width:860px;margin:auto;padding:20px 16px 48px}
+.card{background:var(--white);border:var(--rule);box-shadow:var(--shadow);padding:16px;margin-bottom:18px}
+h2{font:400 1.5rem/1.1 var(--display);text-transform:uppercase;letter-spacing:-.02em;margin:28px 0 14px;display:inline-block;background:var(--yellow);border:var(--rule);padding:4px 10px;transform:rotate(-1deg)}
+h3{margin:0 0 6px;font:400 1.05rem var(--display);text-transform:uppercase}
+.yorum{border:var(--rule-thin);background:var(--yellow);padding:6px 10px;margin-top:8px;font-weight:700}
+.tag{display:inline-block;font:400 .8rem var(--display);text-transform:uppercase;background:var(--ink);color:var(--yellow);padding:2px 8px;margin:0 8px 6px 0}
+audio{width:100%;margin-top:8px}
+.btn{background:var(--red);color:#fff;padding:10px 16px;font-size:.9rem}
+.btn.alt{background:var(--white);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.flash{min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center;font:400 1.3rem/1.3 var(--display);text-transform:uppercase;cursor:pointer;user-select:none}
+.flash .a{font-family:var(--body);text-transform:none;font-weight:800;background:var(--yellow);border:var(--rule-thin);padding:8px 12px;display:inline-block;transform:rotate(-2deg)}
+.opt{display:block;width:100%;text-align:left;margin:10px 0;padding:11px 14px;background:var(--white);font-family:var(--body);font-weight:700;text-transform:none}
+.opt.ok{background:var(--green)}
+.opt.bad{background:var(--red);color:#fff}
+.muted{color:var(--soft);font-weight:700}
+.bar{height:14px;background:var(--white);border:var(--rule-thin);margin:10px 0 16px}
+.bar i{display:block;height:100%;background:var(--red);width:0;transition:width 160ms var(--ease)}
+.tl{display:grid;gap:14px}
+.tl div{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:start}
+.tl div .yorum{display:block}
+.tl b{font:400 1.1rem var(--display);background:var(--ink);color:var(--yellow);text-align:center;padding:4px 0}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.match button{padding:10px;background:var(--white);font-family:var(--body);font-weight:700;text-transform:none}
+.match button.sel{background:var(--yellow)}
+.match button.done{background:var(--green);opacity:.5;cursor:default;box-shadow:none}
+.match button.wrong{background:var(--red);color:#fff}
+#mSonuc{font:400 1.1rem var(--display);text-transform:uppercase}
+.hidden{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<style>
+.wrap{display:grid;grid-template-columns:230px 1fr;gap:20px;max-width:1040px;margin:auto;padding:20px 16px 48px}
+@media(max-width:760px){.wrap{grid-template-columns:1fr}}
+header{max-width:1040px}
+aside .card{padding:10px;position:sticky;top:12px}
+aside button{display:flex;width:100%;gap:8px;align-items:center;text-align:left;background:none;border:0;border-bottom:var(--rule-thin);padding:9px 6px;font:700 .85rem var(--body);color:var(--ink);cursor:pointer}
+aside button:last-child{border-bottom:0}
+aside button.on{background:var(--yellow)}
+aside button .n{font-family:var(--display);min-width:24px}
+aside button.ok .n{color:oklch(50% .17 150)}
+pre{margin:10px 0;background:var(--ink);color:#f3f0e6;padding:14px;overflow-x:auto;border:var(--rule);font:14px/1.55 var(--body)}
+.out{background:var(--white);border:var(--rule-thin);padding:8px 12px;font-weight:700;white-space:pre-wrap}
+.out::before{content:"ÇIKTI";display:block;font:400 .7rem var(--display);color:var(--soft);margin-bottom:2px}
+code{background:var(--yellow);padding:0 4px;border:1px solid var(--ink);font-size:.9em}
+pre code{background:none;border:0;padding:0}
+.k{color:oklch(78% .15 35)}.s{color:oklch(85% .17 120)}.v{color:oklch(80% .12 230)}.c{color:#9a9488}
+.q{margin-top:22px}
+.ilerle{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+#prog{font:400 .9rem var(--display)}
+</style>
+<header>
+<h1>PHP<span>Öğren</span></h1>
+<p>Sıfırdan PHP · 8 ders · mini test · kod yazıp çalıştırdığın görevler</p>
+</header>
+<div class="wrap">
+<aside><div class="card"><div id="prog"></div><div class="bar"><i id="pBar"></i></div><div id="menu"></div></div></aside>
+<main style="padding:0" id="ders"></main>
+</div>
+<script>
+// basit renklendirme
+function hl(src){
+ const e=src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ return e.replace(/(\/\/[^\n]*)|("[^"]*"|'[^']*')|(\$\w+)|\b(echo|if|else|elseif|for|foreach|while|function|return|as|true|false|null|array|class|new|public|private|include|require)\b/g,
+  (m,c,s,v,k)=>c?`<span class="c">${c}</span>`:s?`<span class="s">${s}</span>`:v?`<span class="v">${v}</span>`:`<span class="k">${k}</span>`);
+}
+const D=[
+{b:"PHP nedir?",i:`<p>PHP, <b>sunucuda</b> çalışan bir programlama dilidir. Tarayıcı PHP kodunu görmez; sunucu kodu çalıştırır ve sonucunu (genelde HTML) gönderir. Formlar, giriş sistemleri, veritabanlı siteler PHP ile yapılır.</p>
+<p>PHP kodu <code>&lt;?php</code> ile başlar. Her komut <code>;</code> ile biter. Ekrana yazdırmak için <code>echo</code> kullanılır.</p>`,
+ k:`<?php
+echo "Merhaba Dünya!";`,o:"Merhaba Dünya!",
+ t:[["PHP kodu nerede çalışır?","Sunucuda",["Tarayıcıda","Ekran kartında","Klavyede"]],["Komutların sonuna ne konur?",";",[":",".","Hiçbir şey"]]]},
+{b:"Değişkenler",i:`<p>Değişken, bir değeri saklayan kutudur. PHP'de değişken adı <b><code>$</code></b> ile başlar. Tür yazmana gerek yok, PHP kendisi anlar.</p>
+<p>Türler: metin (<code>string</code>), tam sayı (<code>int</code>), ondalık (<code>float</code>), doğru/yanlış (<code>bool</code>).</p>`,
+ k:`<?php
+$ad = "Selim";      // string
+$yas = 16;          // int
+$boy = 1.78;        // float
+$ogrenci = true;    // bool
+echo $ad;`,o:"Selim",
+ t:[["PHP'de değişken adı neyle başlar?","$",["#","@","&"]],["$yas = 16; hangi türdür?","int",["string","float","bool"]]]},
+{b:"Metinler ve birleştirme",i:`<p>Metinleri birleştirmek için <b>nokta</b> <code>.</code> kullanılır. Çift tırnak <code>"..."</code> içinde değişken yazarsan değeri yerine konur; tek tırnakta <code>'...'</code> konmaz.</p>
+<p>Faydalı fonksiyonlar: <code>strlen()</code> uzunluk, <code>strtoupper()</code> büyük harf.</p>`,
+ k:`<?php
+$ad = "Ali";
+echo "Merhaba " . $ad . "!";
+echo "<br>";
+echo "Selam $ad";   // çift tırnak: değer yazılır
+echo "<br>";
+echo 'Selam $ad';   // tek tırnak: aynen yazılır`,o:"Merhaba Ali!\nSelam Ali\nSelam $ad",
+ t:[["PHP'de metin birleştirme operatörü?",".",["+","&","*"]],["$x=\"ab\"; echo strlen($x); çıktısı?","2",["1","ab","3"]]]},
+{b:"Matematik işlemleri",i:`<p>Operatörler: <code>+ - * /</code>, kalan için <code>%</code>, üs için <code>**</code>. Kısa yazımlar: <code>$a += 5</code>, <code>$a++</code> (1 artır).</p>`,
+ k:`<?php
+$a = 10;
+$b = 3;
+echo $a + $b;   // 13
+echo "<br>";
+echo $a % $b;   // 1 (kalan)
+echo "<br>";
+$a++;
+echo $a;        // 11`,o:"13\n1\n11",
+ t:[["echo 17 % 5; çıktısı?","2",["3","3.4","12"]],["echo 2 ** 3; çıktısı?","8",["6","5","23"]]]},
+{b:"Koşullar: if / else",i:`<p>Bir durum doğruysa bir şey, değilse başka şey yap. Karşılaştırmalar: <code>==</code> eşit, <code>!=</code> eşit değil, <code>&lt; &gt; &lt;= &gt;=</code>. Mantık: <code>&&</code> ve, <code>||</code> veya.</p>
+<p>Dikkat: <code>=</code> atama yapar, <code>==</code> karşılaştırır!</p>`,
+ k:`<?php
+$not = 72;
+if ($not >= 85) {
+    echo "Pekiyi";
+} elseif ($not >= 50) {
+    echo "Geçti";
+} else {
+    echo "Kaldı";
+}`,o:"Geçti",
+ t:[["Karşılaştırma için hangisi kullanılır?","==",["=","=>","->"]],["$x=5; if($x>3 && $x<4) echo 'A'; else echo 'B'; çıktısı?","B",["A","AB","Hata"]]]},
+{b:"Döngüler",i:`<p>Bir işi tekrarlamak için: <code>for</code> (kaç kez olacağı belliyse), <code>while</code> (koşul doğru olduğu sürece).</p>`,
+ k:`<?php
+for ($i = 1; $i <= 5; $i++) {
+    echo $i . " ";
+}
+echo "<br>";
+$sayi = 3;
+while ($sayi > 0) {
+    echo $sayi . "... ";
+    $sayi--;
+}`,o:"1 2 3 4 5\n3... 2... 1...",
+ t:[["for ($i=0; $i<3; $i++) echo $i; çıktısı?","012",["123","0123","3"]],["Koşul hiç yanlış olmazsa while ne olur?","Sonsuz döngü",["Hata vermeden biter","Bir kez çalışır","Hiç çalışmaz"]]]},
+{b:"Diziler",i:`<p>Dizi, birden çok değeri tek değişkende tutar. <code>[ ]</code> ile oluşturulur, sıra <b>0'dan</b> başlar. Anahtarlı (ilişkili) diziler de vardır. <code>foreach</code> ile gezilir; <code>count()</code> eleman sayısını verir.</p>`,
+ k:`<?php
+$meyveler = ["elma", "armut", "muz"];
+echo $meyveler[0];          // elma
+echo "<br>";
+echo count($meyveler);      // 3
+echo "<br>";
+$kisi = ["ad" => "Ayşe", "yas" => 17];
+foreach ($kisi as $anahtar => $deger) {
+    echo "$anahtar: $deger ";
+}`,o:"elma\n3\nad: Ayşe yas: 17",
+ t:[["$d=[\"a\",\"b\",\"c\"]; echo $d[1]; çıktısı?","b",["a","c","1"]],["Dizinin eleman sayısını veren fonksiyon?","count()",["length()","size()","strlen()"]]]},
+{b:"Fonksiyonlar",i:`<p>Fonksiyon, tekrar kullanılabilen kod parçasıdır. <code>function</code> ile tanımlanır, parametre alabilir, <code>return</code> ile sonuç döndürür.</p>`,
+ k:`<?php
+function kare($x) {
+    return $x * $x;
+}
+function selamla($ad = "misafir") {
+    return "Hoş geldin, $ad!";
+}
+echo kare(4);        // 16
+echo "<br>";
+echo selamla("Can");
+echo "<br>";
+echo selamla();`,o:"16\nHoş geldin, Can!\nHoş geldin, misafir!",
+ t:[["Fonksiyondan değer döndüren anahtar kelime?","return",["echo","give","send"]],["function f($a,$b){return $a-$b;} echo f(10,4); çıktısı?","6",["14","-6","104"]]]}
+];
+// --- GÖREVLER: kodu yaz, çalıştır, sonuç tutsun ---
+const G=[
+ {s:`Ekrana tam olarak <code>PHP öğreniyorum</code> yazdır.`,b:`<?php\n// echo kullan\n`,e:"PHP öğreniyorum"},
+ {s:`<code>$sehir</code> değişkenine <code>"İzmir"</code>, <code>$plaka</code> değişkenine <code>35</code> ata. Sonra ikisini sırayla <code>echo</code> ile yazdır. Beklenen: <code>İzmir35</code>`,b:`<?php\n\n`,e:"İzmir35"},
+ {s:`<code>$ad = "Deniz";</code> verildi. Nokta ile birleştirerek <code>Merhaba Deniz, hoş geldin!</code> yazdır.`,b:`<?php\n$ad = "Deniz";\n\n`,e:"Merhaba Deniz, hoş geldin!"},
+ {s:`<code>$a = 7;</code> ve <code>$b = 3;</code> verildi. Önce çarpımlarını, <code>&lt;br&gt;</code>, sonra <code>$a</code>'nın <code>$b</code>'ye bölümünden kalanı yazdır. Beklenen:<br><code>21</code><br><code>1</code>`,b:`<?php\n$a = 7;\n$b = 3;\n\n`,e:"21\n1"},
+ {s:`<code>$sicaklik = 28;</code> verildi. 30 ve üstüyse <code>Sıcak</code>, 15 ile 29 arasıysa <code>Ilık</code>, değilse <code>Soğuk</code> yazdır (if / elseif / else). Beklenen: <code>Ilık</code>`,b:`<?php\n$sicaklik = 28;\n\n`,e:"Ilık"},
+ {s:`<code>for</code> ile 2'den 10'a kadar çift sayıları aralarında boşlukla yazdır. Beklenen: <code>2 4 6 8 10</code>`,b:`<?php\nfor ( ; ; ) {\n\n}\n`,e:"2 4 6 8 10"},
+ {s:`<code>$notlar = [70, 85, 90];</code> verildi. <code>foreach</code> ile toplayıp ortalamayı yazdır. Beklenen: <code>81.666666666667</code> — ya da <code>round()</code> ile <code>81.7</code> (ikisi de kabul)`,b:`<?php\n$notlar = [70, 85, 90];\n$toplam = 0;\n\n`,e:["81.666666666667","81.7"]},
+ {s:`<code>tekMi($n)</code> adında fonksiyon yaz: sayı tekse <code>"tek"</code>, çiftse <code>"çift"</code> döndürsün (<code>return</code>). Sonra <code>echo tekMi(7) . " " . tekMi(10);</code> çalıştır. Beklenen: <code>tek çift</code>`,b:`<?php\nfunction tekMi($n) {\n\n}\necho tekMi(7) . " " . tekMi(10);\n`,e:"tek çift"}
+];
+const norm=t=>t.replace(/<br\s*\/?>/gi,"\n").split("\n").map(x=>x.trim()).join("\n").trim();
+// PHP çalıştırıcı: localhost'ta sunucu.py, başka yerde tarayıcıda php-wasm
+let _php=null;
+async function phpCalistir(kod){
+ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){
+  try{const r=await fetch('/calistir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kod})});
+   if(r.ok)return (await r.json()).cikti}catch(_){}}
+ if(!_php){const {PhpWeb}=await import('https://cdn.jsdelivr.net/npm/php-wasm@0.1.0/PhpWeb.mjs');_php=new PhpWeb()}
+ else await _php.refresh();
+ let o='';const al=e=>{o+=[].concat(e.detail).join('')};
+ _php.addEventListener('output',al);_php.addEventListener('error',al);
+ try{await _php.run(kod);await new Promise(r=>setTimeout(r,30))}
+ finally{_php.removeEventListener('output',al);_php.removeEventListener('error',al)}
+ return o}
+function gorevKur(){
+ const g=G[cur],box=document.createElement('div');box.className='card';
+ let kayit=null;try{kayit=localStorage.getItem('phpKod'+cur)}catch(_){}
+ box.innerHTML=`<h3>Görev — senin sıran</h3><p>${g.s}</p>
+ <textarea id="kod" spellcheck="false" style="width:100%;min-height:170px;background:var(--ink);color:#f3f0e6;border:var(--rule);padding:12px;font:14px/1.55 var(--body);resize:vertical;tab-size:4"></textarea>
+ <div class="row" style="margin-top:10px"><button class="btn" id="calis">▶ Çalıştır</button><button class="btn alt" id="sifirla">Sıfırla</button><span class="muted">Ctrl+Enter = çalıştır</span></div>
+ <div class="out" id="gCikti" style="margin-top:12px;min-height:2.6em"></div><p id="gSonuc" style="font-family:var(--display);text-transform:uppercase;margin:10px 0 0"></p>`;
+ document.getElementById('ders').insertBefore(box,document.querySelector('.ilerle'));
+ const ta=box.querySelector('#kod');ta.value=kayit??g.b;
+ ta.addEventListener('input',()=>{try{localStorage.setItem('phpKod'+cur,ta.value)}catch(_){}});
+ ta.addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const p=ta.selectionStart;ta.setRangeText('    ',p,ta.selectionEnd,'end')}
+  if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();calistir()}});
+ box.querySelector('#sifirla').onclick=()=>{ta.value=g.b;try{localStorage.removeItem('phpKod'+cur)}catch(_){}};
+ box.querySelector('#calis').onclick=calistir;
+ async function calistir(){const out=box.querySelector('#gCikti'),son=box.querySelector('#gSonuc');out.textContent=_php||/^(localhost|127)/.test(location.hostname)?'Çalışıyor...':'PHP yükleniyor (ilk sefer birkaç saniye)...';son.textContent='';
+  try{const cikti=await phpCalistir(ta.value);const n=norm(cikti);out.textContent=n||'(boş çıktı)';
+   const beklenen=[].concat(g.e).map(norm);
+   if(beklenen.includes(n)){son.textContent='✓ Doğru! Görev tamam';son.style.color='oklch(45% .17 150)';
+    try{const gt=JSON.parse(localStorage.getItem('phpGorev')||'[]');if(!gt.includes(cur)){gt.push(cur);localStorage.setItem('phpGorev',JSON.stringify(gt))}}catch(_){}}
+   else{son.textContent=/error|hata/i.test(n)?'✗ Kodda hata var, mesajı oku':'✗ Henüz değil — beklenen çıktıyla karşılaştır';son.style.color='var(--red)'}
+  }catch(e){out.textContent='PHP çalıştırılamadı: '+e}}
+}
+
+const kar=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let bitti=[];try{bitti=JSON.parse(localStorage.getItem('phpBitti')||'[]')}catch(_){}
+let cur=0;try{cur=+localStorage.getItem('phpDers')||0}catch(_){}
+if(!(cur>=0&&cur<D.length))cur=0;bitti=bitti.filter(i=>i<D.length);
+function kaydet(){try{localStorage.setItem('phpBitti',JSON.stringify(bitti));localStorage.setItem('phpDers',cur)}catch(_){}}
+function menu(){document.getElementById('menu').innerHTML=D.map((d,i)=>`<button class="${i===cur?'on':''} ${bitti.includes(i)?'ok':''}" data-i="${i}"><span class="n">${bitti.includes(i)?'✓':i+1}</span>${d.b}</button>`).join('');
+ document.getElementById('prog').textContent=`${bitti.length} / ${D.length} ders tamam`;
+ document.getElementById('pBar').style.width=bitti.length/D.length*100+'%'}
+document.getElementById('menu').onclick=e=>{const b=e.target.closest('button');if(b){cur=+b.dataset.i;goster()}};
+function goster(){const d=D[cur];kaydet();menu();
+ const sorular=d.t.map(q=>({s:q[0],d:q[1],o:kar([q[1],...q[2]])}));
+ document.getElementById('ders').innerHTML=`<div class="card"><div class="muted">DERS ${cur+1}</div><h2 style="margin-top:8px">${d.b}</h2>${d.i}
+ <pre><code>${hl(d.k)}</code></pre><div class="out">${d.o.replace(/</g,'&lt;')}</div></div>
+ <div class="card q"><h3>Mini test</h3><div id="sor">${sorular.map((q,qi)=>`<p style="font-weight:800;margin:14px 0 4px">${qi+1}. ${q.s.replace(/</g,'&lt;')}</p>`+q.o.map(o=>`<button class="opt" data-q="${qi}">${o.replace(/</g,'&lt;')}</button>`).join('')).join('')}</div><p id="sonuc" style="font-family:var(--display);text-transform:uppercase"></p></div>
+ <div class="ilerle"><button class="btn alt" id="geri" ${cur?'':'disabled'}>← Önceki</button><button class="btn" id="ileri">${cur<D.length-1?'Sonraki ders →':'Bitir'}</button></div>`;
+ let cevap=0,dogru=0;
+ document.querySelectorAll('#sor .opt').forEach(b=>b.onclick=()=>{const q=sorular[b.dataset.q];const grup=[...document.querySelectorAll(`#sor .opt[data-q="${b.dataset.q}"]`)];
+  grup.forEach(x=>{x.disabled=true;if(x.textContent===q.d)x.classList.add('ok')});
+  if(b.textContent===q.d)dogru++;else b.classList.add('bad');
+  if(++cevap===sorular.length){const s=document.getElementById('sonuc');
+   if(dogru===sorular.length){s.textContent='Tamam! Ders bitti ✓';if(!bitti.includes(cur))bitti.push(cur);kaydet();menu()}
+   else s.innerHTML=`${dogru}/${sorular.length} — dersi tekrar oku <button class="btn alt" id="tekrar">Tekrar dene</button>`;
+   document.getElementById('tekrar')?.addEventListener('click',goster)}});
+ gorevKur();
+ document.getElementById('geri').onclick=()=>{if(cur){cur--;goster();scrollTo(0,0)}};
+ document.getElementById('ileri').onclick=()=>{if(cur<D.length-1){cur++;goster();scrollTo(0,0)}else document.getElementById('sonuc').textContent=bitti.length===D.length?'Tüm dersler bitti, tebrikler!':'Testleri tamamlanmamış dersler var.'};
+}
+goster();
+</script>
+</body>
+</html>
